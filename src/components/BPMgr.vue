@@ -18,100 +18,194 @@
             </Menu>
         </Header>
         <Content :style="{padding: '0 50px'}">
-          <Breadcrumb :style="{margin: '20px 0','text-align': 'left'}">
+          <!-- <Breadcrumb :style="{margin: '20px 0','text-align': 'left'}">
             您当前位置：
-            <BreadcrumbItem>首页</BreadcrumbItem>
-            <BreadcrumbItem>上传BP</BreadcrumbItem>
-          </Breadcrumb>
+            <BreadcrumbsmallPIC>首页</BreadcrumbsmallPIC>
+            <BreadcrumbsmallPIC>上传BP</BreadcrumbsmallPIC>
+          </Breadcrumb> -->
           <Card>
             <div style="min-height: 720px;">
               <div class="title" @click="panel(1)">
                 <span>课程基本信息</span>
-                <img style="height: 15px;margin-left: 50px;" src="../assets/down.png" alt="">
+                <img v-if="!modal1" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/down.png" alt="">
+                <img v-if="modal1" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/up.png" alt="">
               </div>
               <div class="container" v-if="modal1">
                 <div class="input-cell">
                   <span style="color:red;">*</span>
                   <label>项目名称：</label>
-                  <Input v-model="username" placeholder="请输入手机号" :maxlength="11" style="width: 500px" />
+                  <Input v-model="username" placeholder="请输入项目名称" :maxlength="11" style="width: 500px" />
                   <p style="color:gray;float:left;margin-left:20px;">(请输入2-20个字)</p>
                 </div>
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>项目简介：</label>
-                  <Input v-model="email" placeholder="请输入邮箱" style="width: 500px" />
+                  <Input v-model="email" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(30字内)" :maxlength="30" style="width: 500px;margin-top: 2px;" />
                 </div>
-                <div class="input-cell">
+                <div class="input-cell" style="height: 280px;">
                   <span style="color:red">*</span>
                   <label>项目展示小图：</label>
                   <p class="tipword">(支持格式：jpg、png，尺寸：290*236，大小在300kb之内)</p>
-                  <Input v-model="team" placeholder="请输入公司或团队" style="width: 500px;margin-left: 95px !important;" />
+                  <div>
+                    <template v-if="smallPIC.status === 'finished'">
+                      <img :src="smallPIC.url">
+                      <div class="demo-upload-list-cover">
+                        <icon type="ios-trash-outline" @click.native="smallRemove(smallPIC)"></icon>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <i-progress v-if="smallPIC.showProgress" :percent="smallPIC.percentage" hide-info></i-progress>
+                    </template>
+                  </div><br>
+                  <upload
+                    ref="upload"
+                    :show-upload-list="false"
+                    :on-success="smallSuccess"
+                    :format="['jpg','png']"
+                    :max-size="300"
+                    :on-format-error="smallFormatError"
+                    :on-exceeded-size="smallMaxSize"
+                    multiple
+                    type="drag"
+                    action='api/file/upload'
+                    style="display: inline-block;width:290px;height:236px;margin-left:10px;margin-top:10px;">
+                    <div style="width: 290px;height:236px;line-height: 236px;">
+                      <icon type="md-add" size="60"></icon>
+                    </div>
+                  </upload>
+                  <p style="color:gray;margin-top: 118px;text-align: left;">(尺寸：290*236)</p>
                 </div>
-                <div class="input-cell">
+                <div class="input-cell" style="height:420px;">
                   <span style="color:red">*</span>
                   <label>项目封面：</label>
-                  <p class="tipword">(支持格式：jpg、png，尺寸：290*236，大小在300kb之内)</p>
-                  <Input v-model="team" placeholder="请输入公司或团队" style="width: 500px;margin-left: 95px !important;" />
+                  <p class="tipword">(支持格式：jpg、png，尺寸：670*377，大小在300kb之内)</p>
+                  <div>
+                    <template v-if="topPIC.status === 'finished'">
+                      <img :src="topPIC.url">
+                      <div class="demo-upload-list-cover">
+                        <icon type="ios-trash-outline" @click.native="topRemove(topPIC)"></icon>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <i-progress v-if="topPIC.showProgress" :percent="topPIC.percentage" hide-info></i-progress>
+                    </template>
+                  </div><br>
+                  <upload
+                    ref="upload"
+                    :show-upload-list="false"
+                    :on-success="topSuccess"
+                    :format="['jpg','png']"
+                    :max-size="300"
+                    :on-format-error="topFormatError"
+                    :on-exceeded-size="topMaxSize"
+                    multiple
+                    type="drag"
+                    action='api/file/upload'
+                    style="display: inline-block;width:670px;height:377px;margin-left:10px;margin-top:10px;">
+                    <div style="width: 670px;height:377px;line-height: 377px;">
+                      <icon type="md-add" size="60"></icon>
+                    </div>
+                  </upload>
+                  <p style="color:gray;margin-top: 189px;text-align: left;">(尺寸：670*377)</p>
                 </div>
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>上传BP演讲视频/音频：</label>
-                  <p class="tipword">(支持格式：视频为mp4，音频为mp3，大小在500M之内)</p>
-                  <Input v-model="team" placeholder="请输入公司或团队" style="width: 500px;margin-left: 95px !important;" />
+                  <p class="tipword">(支持格式：视频为mp4，音频为mp3，大小在500M之内)</p><br>
+                  <upload
+                    ref="upload"
+                    :show-upload-list="false"
+                    :on-success="musicSuccess"
+                    :format="['mp3','mp4']"
+                    :max-size="512000"
+                    :on-format-error="musicFormatError"
+                    :on-exceeded-size="musicMaxSize"
+                    action='api/file/upload'
+                    style="display: inline-block;margin-left:10px;margin-top:10px;">
+                    <Button type="error" icon="ios-cloud-upload-outline">上传视频/音频</Button>
+                  </upload>
                 </div>
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>项目详情：</label>
                   <p class="tipword">(为保证良好的阅读体验，建议上传宽度为750px，大小在2M之内图片)</p>
-                  <Input v-model="team" placeholder="请输入公司或团队" style="width: 500px;margin-left: 95px !important;" />
+                  <div class="editor-container">
+                    <UE :defaultMsg='defaultMsg' :config='config' :id='ue' ref="ue"></UE>
+                  </div>
                 </div>
-                <Button class="SubmitBtn" @click="submit">提交</Button>
               </div>
 
               <div class="title" @click="panel(2)">
-                <span>课程基本信息</span>
-                <img style="height: 15px;margin-left: 50px;" src="../assets/down.png" alt="">
+                <span>团队介绍</span>
+                <img v-if="!modal2" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/down.png" alt="">
+                <img v-if="modal2" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/up.png" alt="">
               </div>
               <div class="container" v-if="modal2">
                 <div class="input-cell">
                   <span style="color:red;">*</span>
-                  <label>请填写真实姓名：</label>
-                  <Input v-model="username" placeholder="请输入姓名" style="width: 500px" />
+                  <label>公司或团队名称：</label>
+                  <Input v-model="projectName" placeholder="请输入公司或团队名称" style="width: 500px" />
                 </div>
                 <div class="input-cell">
                   <span style="color:red">*</span>
-                  <label>请填写常用邮箱：</label>
-                  <Input v-model="email" placeholder="请输入邮箱" style="width: 500px" />
+                  <label>团队成员：</label><br>
+                  <div v-for="(item,index) in teamList" :key="index" style="overflow:hidden;width:100%;margin: 10px;">
+                    <div class="headpic">
+                      <img :src="item.headpic" alt="">
+                    </div>
+                    <div class="memberInfo">
+                      <div class="input-cell" style="width: auto;">
+                        <span style="color:red;">*</span>
+                        <label>姓名：</label>
+                        <Input v-model="projectName" placeholder="请输入公司或团队名称" style="width: 300px" />
+                      </div>
+                      <div class="input-cell" style="width: auto;float:right">
+                        <span style="color:red;">*</span>
+                        <label>职位或团队中角色：</label>
+                        <Input v-model="projectName" placeholder="请输入公司或团队名称" style="width: 300px" />
+                      </div>
+                      <div class="input-cell">
+                        <span style="color:red">*</span>
+                        <label>介绍：</label>
+                        <Input v-model="email" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(150字内)" :maxlength="30" style="width: calc(100% - 63px);margin-top: 2px;" />
+                      </div>
+                    </div>
+                    <div @click="delMember(index)" style="margin-left: 20px;cursor:pointer;">
+                      <img src="../assets/del.png" alt="">
+                    </div>
+                  </div>
+                  <Button class="submitBtn" @click="addMember">添加成员</Button>
                 </div>
-                <div class="input-cell">
-                  <span style="color:red">*</span>
-                  <label>请填写公司或团队名称：</label>
-                  <Input v-model="team" placeholder="请输入公司或团队" style="width: 500px;margin-left: 95px !important;" />
-                </div>
-                <Button class="SubmitBtn" @click="submit">提交</Button>
               </div>
 
               <div class="title"  @click="panel(3)">
-                <span>课程基本信息</span>
-                <img style="height: 15px;margin-left: 50px;" src="../assets/down.png" alt="">
+                <span>PPT</span>
+                <img v-if="!modal3" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/down.png" alt="">
+                <img v-if="modal3" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/up.png" alt="">
               </div>
               <div class="container" v-if="modal3">
                 <div class="input-cell">
                   <span style="color:red;">*</span>
-                  <label>请填写真实姓名：</label>
-                  <Input v-model="username" placeholder="请输入姓名" style="width: 500px" />
+                  <label>ppt：</label>
+                  <p class="tipword">(格式：pptx，大小建议在500MB内)</p><br>
+                  <upload
+                    ref="upload"
+                    :show-upload-list="false"
+                    :on-success="pptSuccess"
+                    :format="['pptx']"
+                    :max-size="512000"
+                    :on-format-error="pptFormatError"
+                    :on-exceeded-size="pptMaxSize"
+                    action='api/file/upload'
+                    style="display: inline-block;margin-left:10px;margin-top:10px;">
+                    <Button type="error" icon="ios-cloud-upload-outline">上传PPT</Button>
+                  </upload>
                 </div>
-                <div class="input-cell">
-                  <span style="color:red">*</span>
-                  <label>请填写常用邮箱：</label>
-                  <Input v-model="email" placeholder="请输入邮箱" style="width: 500px" />
-                </div>
-                <div class="input-cell">
-                  <span style="color:red">*</span>
-                  <label>请填写公司或团队名称：</label>
-                  <Input v-model="team" placeholder="请输入公司或团队" style="width: 500px;margin-left: 95px !important;" />
-                </div>
-                <Button class="SubmitBtn" @click="submit">提交</Button>
+              </div>
+              <div class="container">
+                <Button class="cancelBtn" @click="cancel">取消</Button>
+                <Button class="saveBtn" @click="save">存为草稿</Button>
+                <Button class="submitBtn" @click="submit">提交审核</Button>
               </div>
             </div>
           </Card>
@@ -143,55 +237,182 @@
   </div>
 </template>
 <script>
+import UE from "./ue/ue";
 export default {
+  components: { UE },
   data() {
     return {
-        id:'',
-        username:'',
-        email:'',
-        team:'',
-        modal1:true,
-        modal2:true,
-        modal3:true
+      id: "",
+      username: "",
+      email: "",
+      team: "",
+      modal1: true,
+      modal2: true,
+      modal3: true,
+      smallPIC: [],
+      smallPICName: "",
+      smallvisible: false,
+      topPIC: [],
+      topPICName: "",
+      topvisible: false,
+      projectName: "",
+      teamList: [
+        {
+          headpic: "../../static/head.png",
+          name: "",
+          actor: "",
+          introduction: ""
+        }
+      ],
+      defaultMsg:'',
+      config: {
+        initialFrameWidth: null,
+        initialFrameHeight: 350
+      },
+      ue: "ue",
+      UEcontent:''
     };
   },
-  methods:{
-    panel(p){
-      switch(p){
-        case 1:this.modal1 = !this.modal1;break;
-        case 2:this.modal2 = !this.modal2;break;
-        case 3:this.modal3 = !this.modal3;break;
+  methods: {
+    smallRemove(file) {
+      const fileList = this.$refs.upload.fileList;
+      this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
+    },
+    smallSuccess(res, file) {
+      file.url =
+        "https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar";
+      file.name = "7eb99afb9d5f317c912f08b5212fd69a";
+    },
+    smallFormatError(file) {
+      this.$Notice.warning({
+        title: "文件格式不正确！",
+        desc: "文件格式" + file.name + " 不正确, 请选择.jpg或.png的文件"
+      });
+    },
+    smallMaxSize(file) {
+      this.$Notice.warning({
+        title: "超出文件大小限制！",
+        desc: "文件" + file.name + "太大, 请选择不超过300kb的文件"
+      });
+    },
+    musicFormatError(file) {
+      this.$Notice.warning({
+        title: "文件格式不正确！",
+        desc: "文件格式" + file.name + " 不正确, 请选择.mp3或.mp4的文件"
+      });
+    },
+    musicMaxSize(file) {
+      this.$Notice.warning({
+        title: "超出文件大小限制！",
+        desc: "文件" + file.name + "太大, 请选择不超过500Mb的文件"
+      });
+    },
+
+    topRemove(file) {
+      const fileList = this.$refs.upload.fileList;
+      this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
+    },
+    topSuccess(res, file) {
+      file.url =
+        "https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar";
+      file.name = "7eb99afb9d5f317c912f08b5212fd69a";
+    },
+    topFormatError(file) {
+      this.$Notice.warning({
+        title: "文件格式不正确！",
+        desc: "文件格式" + file.name + " 不正确, 请选择.jpg或.png的文件"
+      });
+    },
+    topMaxSize(file) {
+      this.$Notice.warning({
+        title: "超出文件大小限制！",
+        desc: "文件" + file.name + "太大, 请选择不超过500MB的文件"
+      });
+    },
+    musicSuccess(res, file) {
+      file.url =
+        "https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar";
+      file.name = "7eb99afb9d5f317c912f08b5212fd69a";
+    },
+    musicFormatError(file) {
+      this.$Notice.warning({
+        title: "文件格式不正确！",
+        desc: "文件格式" + file.name + " 不正确, 请选择.jpg或.png的文件"
+      });
+    },
+    musicMaxSize(file) {
+      this.$Notice.warning({
+        title: "超出文件大小限制！",
+        desc: "文件" + file.name + "太大, 请选择不超过500MB的文件"
+      });
+    },
+    pptSuccess(res, file) {
+      file.url =
+        "https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar";
+      file.name = "7eb99afb9d5f317c912f08b5212fd69a";
+    },
+    pptFormatError(file) {
+      this.$Notice.warning({
+        title: "文件格式不正确！",
+        desc: "文件格式" + file.name + " 不正确, 请选择.pptx的文件"
+      });
+    },
+    pptMaxSize(file) {
+      this.$Notice.warning({
+        title: "超出文件大小限制！",
+        desc: "文件" + file.name + "太大, 请选择不超过500MB的文件"
+      });
+    },
+    panel(p) {
+      switch (p) {
+        case 1:
+          this.modal1 = !this.modal1;
+          break;
+        case 2:
+          this.modal2 = !this.modal2;
+          break;
+        case 3:
+          this.modal3 = !this.modal3;
+          break;
       }
-      
     },
-    submit(){
-
+    cancel() {},
+    save() {},
+    submit() {
+      this.UEcontent = this.$refs.ue.getUEContentTxt();
     },
-    logout(){
-
+    logout() {},
+    addMember() {
+      this.teamList.push({
+        headpic: "",
+        name: "",
+        actor: "",
+        introduction: ""
+      });
+    },
+    delMember(index) {
+      this.teamList.splice(index, 1);
     }
   },
-  updated(){
-
-  },
-  mounted(){
+  updated() {},
+  mounted() {
     this.id = this.$route.params.BPId;
   }
-}
+};
 </script>
 
 <style scoped>
 .ivu-layout-header {
-    background: rgb(58,59,60);
+  background: rgb(58, 59, 60);
 }
 .ivu-menu-light {
-    background: rgb(58,59,60);
+  background: rgb(58, 59, 60);
 }
-.ivu-menu{
+.ivu-menu {
   position: unset;
 }
 .layout {
-  border: 1px solid rgb(58,59,60);
+  border: 1px solid rgb(58, 59, 60);
   background: #f5f7f9;
   position: relative;
   border-radius: 4px;
@@ -211,7 +432,7 @@ export default {
   margin: 0 auto;
   margin-right: 20px;
   overflow: hidden;
-  color:rgb(155,140,184)
+  color: rgb(155, 140, 184);
 }
 .in-icon span {
   width: 40px;
@@ -232,13 +453,24 @@ export default {
   opacity: 0.5;
   margin-left: 5px;
 }
-.SubmitBtn{
-  width:300px;
+.cancelBtn {
+  width: 200px;
   margin-top: 30px;
-  background-color:#c63a47;
-  border: 1px solid #c63a47;
-  color:white;
   font-size: 18px;
+}
+.saveBtn {
+  width: 200px;
+  margin-top: 30px;
+  font-size: 18px;
+  margin-left: 10px;
+}
+.submitBtn {
+  width: 200px;
+  margin-top: 30px;
+  border: 1px solid #c63a47;
+  color: #c63a47;
+  font-size: 18px;
+  margin-left: 10px;
 }
 .footimg {
   background-image: url(../assets/footer.png);
@@ -268,6 +500,8 @@ export default {
   padding: 10px;
   background: rgb(254, 247, 247);
   cursor: pointer;
+  position: relative;
+  margin-top: 10px;
 }
 .container {
   padding: 10px;
@@ -276,7 +510,7 @@ export default {
 .input-cell {
   width: 100%;
   overflow: hidden;
-  padding-top: 20px;
+  margin-top: 20px;
 }
 .input-cell span,
 .input-cell label,
@@ -286,7 +520,32 @@ export default {
 .input-cell label {
   font-weight: bold;
 }
-.tipword{
+.tipword {
   float: left;
+}
+.headpic {
+  height: 100px;
+  width: 100px;
+}
+.headpic img {
+  height: 100px;
+  width: 100px;
+  border-radius: 50px;
+  margin-top: 30px;
+}
+.memberInfo {
+  height: 140px;
+  width: 80%;
+  margin-left: 20px;
+}
+.info {
+  border-radius: 10px;
+  line-height: 20px;
+  padding: 10px;
+  margin: 10px;
+  background-color: #ffffff;
+}
+.editor-container{
+  margin-top: 10px;
 }
 </style>
