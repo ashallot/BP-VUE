@@ -12,6 +12,7 @@
             </Menu>
         </Header>
         <Content>
+          <div class="containner-box">
             <div class="bgimg">
               <div class="loginForm">
                 <div class="title">手机验证码登录</div>
@@ -25,17 +26,22 @@
                 </div>
                 <div class="in-icon" style="margin-top: 10px;margin-bottom: 10px;position: relative;overflow: hidden;">
                   <span><i class="pwdpic"></i></span>
-                  <input class="bp-input" v-model="code" placeholder="请输入验证码" style="width: 180px;float: left;" />
-                  <Button @click="getCode" style="float:left;margin-left:6px;width:112px;height: 40px;"><div style="color:#c63a47">{{getTxt}}</div></Button>
+                  <input class="bp-input" v-model="code" placeholder="请输入验证码" maxlength="4" style="width: 180px;float: left;" />
+                  <Button @click="getCode" style="float:left;margin-left:6px;width:112px;height: 40px;">
+                    <!-- <div style="color:#c63a47">{{getTxt}}</div> -->
+                    <div style="color:#c63a47" v-if="!sendMsgDisabled && !reGet">发送验证码</div>
+                    <div style="color:#c63a47" v-if="!sendMsgDisabled && reGet">重新获取</div>
+                    <div style="color:#c63a47" v-if="sendMsgDisabled">{{rTime+'秒后重新获取'}}</div>
+                  </Button>
                 </div>
-                <div class="warn">
+                <div class="warn" v-if="codeValidate">
                   <div style="float:left"><img src="../assets/warning.png" alt=""></div>
                   <span>验证码错误</span>
                 </div>
                 <Button class="LoginBtn" @click="login">登录/注册</Button>
               </div>
             </div>
-            <div class="footimg">
+            <div v-if="false" class="footimg">
               <Header>
                 <Menu mode="horizontal"  active-name="1">
                     <div style="height:30px;float:left;margin-left:20px;">
@@ -56,8 +62,9 @@
                         </li>
                     </ul>
                 </Menu>
-            </Header>
+              </Header>
             </div>
+          </div>
         </Content>
     </Layout>
     <Modal v-model="modal" width="360">
@@ -86,53 +93,68 @@ export default {
       telValidate:false,
       codeValidate:false,
       code:'',
-      serverCode:'',
       isInvestor:false,
       isUserInfo:false,
-      modal:false
+      modal:false,
+      reGet: false, // 重新获取
+      rTime: 60, // 发送验证码倒计时
+      sendMsgDisabled: false, // 发送验证码按钮状态
     };
   },
   methods:{
-    login(){
-      this.$router.push({path: '/BPIndex'})
-      // if(this.code != this.serverCode){
-      //   this.codeValidate = true;
-      // }else{
-      //   this.codeValidate = false;
-      //   this.$http.post('url',{  
-      //     tel:this.tel,  
-      //     code:this.code  
-      //   },{  
-      //     emulateJSON:true  
-      //   }).then(function(response){  
-      //     this.data = response.data;
-      //     // this.isInvestor =
-      //     // this.isUserInfo =
-      //     if(!this.isInvestor){
-      //       if(this.isUserInfo){
-      //         this.$router.push({path: '/BPIndex'})
-      //       }else{
-      //         this.$router.push({path: '/userInfo'})
-      //       }
-      //     }else{
-      //       this.modal = true;
-      //     }
-      //   },function(response){  
-      //     console.log(response)
-      //   });
-      // }
+    login() {
+      if(this.code == null || this.code.trim().length == 0){
+        this.codeValidate = true;
+      }else{
+        this.codeValidate = false;
+        this.$https.post('/bp/user/login', {  
+          userName: this.tel,  
+          vCode: this.code,
+          userType: 0
+        }).then(res => {
+          console.log(res)
+          if (res.status === 200) {
+            var Cookie = 'JSESSIONID=' + res.data.data.JSESSIONID
+            localStorage.Cookie = Cookie
+            this.$router.push({path: '/BPIndex'})
+          }
+        });
+      }
+    },
+    send() {
+      let that = this;
+      that.sendMsgDisabled = true;
+      let rTime = that.rTime;
+      // 倒计时
+      let interval = window.setInterval(() => {
+        if (--that.rTime <= 0) {
+          that.rTime = rTime;
+          that.sendMsgDisabled = false;
+          that.reGet = true; // 重新获取按钮
+          window.clearInterval(interval);
+        }
+      }, 1000);
     },
     getCode(){
-      if(this.tel.substring(0,1) != '1' || this.tel.length != 11){
+      const that = this
+      if (this.sendMsgDisabled) {
+        return
+      }
+      if (this.tel.substring(0,1) != '1' || this.tel.length != 11) {
         this.telValidate = true;
-      }else{
+      } else {
         this.telValidate = false;
-        this.$http.get('url',{
-          tel:this.tel
-        }).then(function(response){
-          this.serverCode = response.data.code;
-        },function(response){  
-          console.log(response)
+        this.$https.get("/bp/user/sendSms" , {
+          params: {
+            userName: this.tel
+          }
+        }).then(res => {
+          console.log(res)
+          if (res.status === 200) {
+            var Cookie = 'JSESSIONID=' + res.data.data.JSESSIONID
+            localStorage.Cookie = Cookie
+            that.send()
+          }
         });
       }
     },
@@ -155,6 +177,7 @@ export default {
   opacity: 0.6;
   border-radius: 5px;
   padding-left: 40px;
+  color: #FFFFFF;
 }
 input::-webkit-input-placeholder {
   color: white;
@@ -172,10 +195,9 @@ input:-ms-input-placeholder {
   color: white;
 }
 .layout {
-  border: 1px solid #d7dde4;
-  background: #f5f7f9;
+  /* border: 1px solid #d7dde4; */
+  background: #28292c;
   position: relative;
-  border-radius: 4px;
   overflow: hidden;
 }
 .layout-logo {
@@ -194,8 +216,9 @@ input:-ms-input-placeholder {
 }
 .bgimg {
   background-image: url(../assets/bg.png);
-  height: 890px;
+  height: calc(100vh - 64px);
   width: 100%;
+  background-size: cover;
 }
 .loginForm {
   height: 400px;
@@ -266,8 +289,9 @@ input:-ms-input-placeholder {
   background-image: url(../assets/footer.png);
   height: 30px;
   width: 100%;
-  position: absolute;
-  bottom: 0;
+  background-size: cover;
+  /* position: absolute;
+  bottom: 0; */
 }
 .footimg div,
 .footimg div ul {
@@ -286,4 +310,9 @@ input:-ms-input-placeholder {
   line-height: 30px;
   cursor: pointer;
 }
+.containner-box {
+  display: flex;
+  flex-direction: column;
+}
+
 </style>

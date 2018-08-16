@@ -17,16 +17,16 @@
                 </div>
             </Menu>
         </Header>
-        <Content :style="{padding: '0 50px'}">
-          <!-- <Breadcrumb :style="{margin: '20px 0','text-align': 'left'}">
+        <Content class="content-box">
+          <Breadcrumb :style="{margin: '20px 0','text-align': 'left'}">
             您当前位置：
-            <BreadcrumbsmallPIC>首页</BreadcrumbsmallPIC>
-            <BreadcrumbsmallPIC>上传BP</BreadcrumbsmallPIC>
-          </Breadcrumb> -->
-          <Card>
+            <BreadcrumbItem to="/BPIndex">首页</BreadcrumbItem>
+            <BreadcrumbItem>上传BP</BreadcrumbItem>
+          </Breadcrumb>
+          <Card class="card-box">
             <div style="min-height: 720px;">
               <div class="title" @click="panel(1)">
-                <span>课程基本信息</span>
+                <span style="margin-left: 20px;">项目基本信息</span>
                 <img v-if="!modal1" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/down.png" alt="">
                 <img v-if="modal1" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/up.png" alt="">
               </div>
@@ -59,6 +59,7 @@
                   </div><br>
                   <upload
                     ref="upload"
+                    :before-upload="handleUpload"
                     :show-upload-list="false"
                     :on-success="smallSuccess"
                     :format="['jpg','png']"
@@ -66,8 +67,10 @@
                     :on-format-error="smallFormatError"
                     :on-exceeded-size="smallMaxSize"
                     multiple
+                    with-credentials
                     type="drag"
-                    action='api/file/upload'
+                    action='https://t.govlan.com:8443/bp/file/upload'
+                    :data="{'Cookie': Cookie}"
                     style="display: inline-block;width:290px;height:236px;margin-left:10px;margin-top:10px;">
                     <div style="width: 290px;height:236px;line-height: 236px;">
                       <icon type="md-add" size="60"></icon>
@@ -136,7 +139,7 @@
               </div>
 
               <div class="title" @click="panel(2)">
-                <span>团队介绍</span>
+                <span style="margin-left: 20px;">团队介绍</span>
                 <img v-if="!modal2" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/down.png" alt="">
                 <img v-if="modal2" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/up.png" alt="">
               </div>
@@ -149,25 +152,27 @@
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>团队成员：</label><br>
-                  <div v-for="(item,index) in teamList" :key="index" style="overflow:hidden;width:100%;margin: 10px;">
+                  <div v-for="(item,index) in teamList" :key="index" style="overflow:hidden;width:100%; height: auto; margin: 10px;display: flex;flex-direction:row;">
                     <div class="headpic">
                       <img :src="item.headpic" alt="">
                     </div>
                     <div class="memberInfo">
-                      <div class="input-cell" style="width: auto;">
-                        <span style="color:red;">*</span>
-                        <label>姓名：</label>
-                        <Input v-model="projectName" placeholder="请输入公司或团队名称" style="width: 300px" />
+                      <div style="display: flex; flex-direction: row;">
+                        <div class="input-cell" style="display: flex; flex-direction: row;flex: 1;padding-right: 4px;">
+                          <span style="color:red;">*</span>
+                          <span style="width: 80px;">姓名：</span>
+                          <Input v-model="item.name" placeholder="请输入团队成员姓名" />
+                        </div>
+                        <div class="input-cell" style="float:right; display: flex; flex-direction: row;flex: 1;padding-left: 4px;">
+                          <span style="color:red;">*</span>
+                          <span style="width: 80px;">角色：</span>
+                          <Input v-model="item.actor" placeholder="请输入在公司职位或团队中角色" />
+                        </div>
                       </div>
-                      <div class="input-cell" style="width: auto;float:right">
-                        <span style="color:red;">*</span>
-                        <label>职位或团队中角色：</label>
-                        <Input v-model="projectName" placeholder="请输入公司或团队名称" style="width: 300px" />
-                      </div>
-                      <div class="input-cell">
+                      <div class="input-cell" style="display: flex; flex-direction: row;">
                         <span style="color:red">*</span>
-                        <label>介绍：</label>
-                        <Input v-model="email" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(150字内)" :maxlength="30" style="width: calc(100% - 63px);margin-top: 2px;" />
+                        <span style="width: 68px;">介绍：</span>
+                        <Input v-model="item.introduction" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(150字内)" :maxlength="30" style="flex: 1; margin-top: 2px;" />
                       </div>
                     </div>
                     <div @click="delMember(index)" style="margin-left: 20px;cursor:pointer;">
@@ -179,7 +184,7 @@
               </div>
 
               <div class="title"  @click="panel(3)">
-                <span>PPT</span>
+                <span style="margin-left: 20px;">PPT</span>
                 <img v-if="!modal3" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/down.png" alt="">
                 <img v-if="modal3" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/up.png" alt="">
               </div>
@@ -210,7 +215,7 @@
             </div>
           </Card>
         </Content>
-        <div class="footimg">
+        <div v-if="false" class="footimg">
               <Header>
                 <Menu mode="horizontal"  active-name="1">
                     <div style="height:60px;float:left;margin-left:20px;">
@@ -242,6 +247,7 @@ export default {
   components: { UE },
   data() {
     return {
+      Cookie: localStorage.Cookie,
       id: "",
       username: "",
       email: "",
@@ -270,15 +276,30 @@ export default {
         initialFrameHeight: 350
       },
       ue: "ue",
-      UEcontent:''
+      UEcontent:'',
+      file: ''
     };
   },
   methods: {
+    handleUpload (file) { // 保存需要上传的文件
+        this.file = file
+        this.uploadFile()
+        return false;
+    },
+    uploadFile () {
+      // 上传文件
+      var formdata = new FormData();
+      formdata.append('file', this.file);
+      this.$https.post("/bp/file/upload", formdata).then((res) => {
+        console.log(res)
+      })
+    },
     smallRemove(file) {
       const fileList = this.$refs.upload.fileList;
       this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
     },
     smallSuccess(res, file) {
+      debugger
       file.url =
         "https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar";
       file.name = "7eb99afb9d5f317c912f08b5212fd69a";
@@ -334,12 +355,6 @@ export default {
         "https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar";
       file.name = "7eb99afb9d5f317c912f08b5212fd69a";
     },
-    musicFormatError(file) {
-      this.$Notice.warning({
-        title: "文件格式不正确！",
-        desc: "文件格式" + file.name + " 不正确, 请选择.jpg或.png的文件"
-      });
-    },
     musicMaxSize(file) {
       this.$Notice.warning({
         title: "超出文件大小限制！",
@@ -384,7 +399,7 @@ export default {
     logout() {},
     addMember() {
       this.teamList.push({
-        headpic: "",
+        headpic: "../../static/head.png",
         name: "",
         actor: "",
         introduction: ""
@@ -397,6 +412,7 @@ export default {
   updated() {},
   mounted() {
     this.id = this.$route.params.BPId;
+    this.Cookie = localStorage.Cookie;
   }
 };
 </script>
@@ -412,10 +428,8 @@ export default {
   position: unset;
 }
 .layout {
-  border: 1px solid rgb(58, 59, 60);
   background: #f5f7f9;
   position: relative;
-  border-radius: 4px;
   overflow: hidden;
 }
 .layout-logo {
@@ -524,19 +538,24 @@ export default {
   float: left;
 }
 .headpic {
-  height: 100px;
+  /* height: 100px; */
   width: 100px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 .headpic img {
   height: 100px;
   width: 100px;
   border-radius: 50px;
-  margin-top: 30px;
+  /* margin-top: 30px; */
 }
 .memberInfo {
-  height: 140px;
+  /* height: 140px; */
   width: 80%;
   margin-left: 20px;
+  display: flex;
+  flex-direction: column;
 }
 .info {
   border-radius: 10px;
@@ -548,4 +567,19 @@ export default {
 .editor-container{
   margin-top: 10px;
 }
+
+.content-box {
+  min-height: calc(100vh - 64px);
+  min-width: 1200px;
+  padding: 0px calc((100vw - 1200px) / 2);
+}
+
+.card-box {
+  margin-bottom: 60px;
+}
+
+.ivu-card-body {
+    padding: 0px !important;
+}
+
 </style>

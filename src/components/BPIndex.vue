@@ -17,40 +17,30 @@
                 </div>
             </Menu>
         </Header>
-        <Content :style="{padding: '0 50px'}">
+        <Content class="content-box">
           <Breadcrumb :style="{margin: '20px 0','text-align': 'left'}">
             您当前位置：
-            <BreadcrumbItem>首页</BreadcrumbItem>
-            <BreadcrumbItem>上传BP</BreadcrumbItem>
+            <BreadcrumbItem to="/BPIndex">首页</BreadcrumbItem>
+            <BreadcrumbItem>BP列表</BreadcrumbItem>
           </Breadcrumb>
-          <Card>
+          <Card class="card-box">
             <div style="min-height: 720px;">
               <div class="blank" v-if="data == ''">
                 <img src="../assets/blank.png" alt=""><br>
                 <p style="color: gray;">您还没上传过BP哦~</p><br>
-                <Button class="uploadBtn" @click="upload">立即上传</Button>
+                <Button size="large" class="uploadBtn" @click="upload">立即上传</Button>
               </div>
               <div class="container" v-if="data != ''">
                 <div class="top">
-                  <Input v-model="keyword" size="large" placeholder="请输入关键字后回车搜索" style="width: 500px;height:40px"
+                  <Input v-model="keyword" size="default" placeholder="请输入关键字后回车搜索" style="width: 500px;"
                    @keyup.enter.native="handleSearch()">
                     <Icon type="ios-search" slot="prefix"></Icon>
                   </Input>
-                  <Dropdown trigger="click" style="margin-left: 20px">
-                    <Button>
-                      {{type}}
-                      <Icon type="ios-arrow-down"></Icon>
-                    </Button>
-                    <DropdownMenu slot="list">
-                      <DropdownItem @click.native="choiseType('全部')">全部</DropdownItem>
-                      <DropdownItem @click.native="choiseType('草稿')">草稿</DropdownItem>
-                      <DropdownItem @click.native="choiseType('待审核')">待审核</DropdownItem>
-                      <DropdownItem @click.native="choiseType('未通过')">未通过</DropdownItem>
-                      <DropdownItem @click.native="choiseType('上架中')">上架中</DropdownItem>
-                      <DropdownItem @click.native="choiseType('已下架')">已下架</DropdownItem>
-                    </DropdownMenu>
-                </Dropdown>
-                <Button class="uploadBtn" @click="upload">上传BP</Button>
+                  <span style="margin-left: 20px; margin-right: 20px;">BP状态</span>
+                  <Select v-model="bpStatus" style="width:200px">
+                    <Option v-for="item in bpStatusList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                  </Select>
+                  <Button size="large" class="uploadBtn" @click="upload">上传BP</Button>
                 </div>
                 <Table border style="margin-top:20px;" :columns="columns" :data="listdata"></Table>
                 <Page style="margin-top:20px;text-align:right" :total="pageTotal" :current="pageNum"
@@ -59,7 +49,7 @@
             </div>
           </Card>
         </Content>
-        <div class="footimg">
+        <div v-if="false" class="footimg">
               <Header>
                 <Menu mode="horizontal"  active-name="1">
                     <div style="height:60px;float:left;margin-left:20px;">
@@ -94,6 +84,33 @@ export default {
       type: "全部",
       pageTotal:15,
       pageNum:1,
+      bpStatus: '',
+      bpStatusList: [
+        {
+          value: '0',
+          label: '全部'
+        },
+        {
+          value: '1',
+          label: '草稿'
+        },
+        {
+          value: '2',
+          label: '待审核'
+        },
+        {
+          value: '3',
+          label: '未通过'
+        },
+        {
+          value: '4',
+          label: '上架中'
+        },
+        {
+          value: '5',
+          label: '已下架'
+        }
+      ],
       columns: [
         {
           title: "项目名称",
@@ -160,67 +177,7 @@ export default {
         }
       ],
       listdata: [
-        {
-          projectName: "BP",
-          projectIntroduce: "GG",
-          projectDetail: "已上架",
-          inviteCode: "546545",
-          createAt: "2018-1-12"
-        },{
-          projectName: "BP",
-          projectIntroduce: "GG",
-          projectDetail: "已上架",
-          inviteCode: "546545",
-          createAt: "2018-1-12"
-        },{
-          projectName: "BP",
-          projectIntroduce: "GG",
-          projectDetail: "已上架",
-          inviteCode: "546545",
-          createAt: "2018-1-12"
-        },{
-          projectName: "BP",
-          projectIntroduce: "GG",
-          projectDetail: "已上架",
-          inviteCode: "546545",
-          createAt: "2018-1-12"
-        },{
-          projectName: "BP",
-          projectIntroduce: "GG",
-          projectDetail: "已上架",
-          inviteCode: "546545",
-          createAt: "2018-1-12"
-        },{
-          projectName: "BP",
-          projectIntroduce: "GG",
-          projectDetail: "已上架",
-          inviteCode: "546545",
-          createAt: "2018-1-12"
-        },{
-          projectName: "BP",
-          projectIntroduce: "GG",
-          projectDetail: "已上架",
-          inviteCode: "546545",
-          createAt: "2018-1-12"
-        },{
-          projectName: "BP",
-          projectIntroduce: "GG",
-          projectDetail: "已上架",
-          inviteCode: "546545",
-          createAt: "2018-1-12"
-        },{
-          projectName: "BP",
-          projectIntroduce: "GG",
-          projectDetail: "已上架",
-          inviteCode: "546545",
-          createAt: "2018-1-12"
-        },{
-          projectName: "BP",
-          projectIntroduce: "GG",
-          projectDetail: "已上架",
-          inviteCode: "546545",
-          createAt: "2018-1-12"
-        }
+        
       ]
     };
   },
@@ -292,10 +249,10 @@ export default {
   position: unset;
 }
 .layout {
-  border: 1px solid rgb(58, 59, 60);
+  /* border: 1px solid rgb(58, 59, 60); */
   background: #f5f7f9;
   position: relative;
-  border-radius: 4px;
+  /* border-radius: 4px; */
   overflow: hidden;
 }
 .layout-logo {
@@ -336,8 +293,10 @@ export default {
 .uploadBtn {
   background-color: #c63a47;
   color: white;
-  font-size: 18px;
+  /* font-size: 16px; */
   margin-left: 20px;
+  /* height: 30px; */
+  /* line-height: 30px; */
 }
 .footimg {
   background-image: url(../assets/footer.png);
@@ -366,5 +325,18 @@ export default {
 }
 .top {
   text-align: left;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.content-box {
+  min-height: calc(100vh - 64px);
+  min-width: 1200px;
+  padding: 0px calc((100vw - 1200px) / 2);
+}
+
+.card-box {
+  margin-bottom: 60px;
 }
 </style>

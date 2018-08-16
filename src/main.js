@@ -6,6 +6,7 @@ import router from './router'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 import VueResource from "vue-resource"
+import axios from 'axios'
 
 import '../static/UE/ueditor.config.js'
 import '../static/UE/ueditor.all.min.js'
@@ -15,17 +16,53 @@ import '../static/UE/ueditor.parse.min.js'
 Vue.config.productionTip = false
 Vue.use(iView);
 Vue.use(VueResource)
+if (process.env.NODE_ENV === 'production') {
+    axios.defaults.baseURL = 'https://t.govlan.com:8443'
+}
+axios.defaults.timeout = 60000
+axios.defaults.withCredentials = true
 
-Vue.http.interceptors.push((request, next) => {
-    request.credentials = true; // 接口每次请求会跨域携带cookie
-    request.method = 'POST'; // 请求方式（get,post）
-    request.headers.set('Cookie', 'JSESSIONID=57159BC8AD5443CA1879ACDF26650ED3') // 请求headers携带参数
-    confirm.log(request.headers)
-    next(function(response) {
-        return response;
-
-    });
+axios.interceptors.request.use((config) => {
+    if (config.url.indexOf('sendSms') == -1) {
+        config.headers = {
+            'Content-Type': 'application/ld+json',
+            'set-cookie': localStorage.Cookie,
+            'Cookie': localStorage.Cookie
+        }
+    } else {
+        config.headers = {
+            'Content-Type': 'application/ld+json'
+        }
+    }
+    return config
+}, (error) => {
+    return Promise.reject(error)
 })
+
+axios.interceptors.response.use(function (response) {
+    // Do something with response data
+    if (process.env.NODE_ENV === 'development') {
+        // consolFe.log(response)
+    }
+    iView.LoadingBar.finish()
+    return response
+    }, function (error) {
+    // Do something with response error
+    var response = error.response
+    console.log(error)
+    // 需要登录
+    if (response.status === 401) {
+        
+    } else if (response.status === 400) {
+        
+    } else if (response.status === 500) {
+        iView.Message.error('网络服务器忙~请稍后再试！')
+    }
+    iView.LoadingBar.finish()
+    return error
+})
+
+Vue.prototype.$https = axios
 
 /* eslint-disable no-new */
 new Vue({
