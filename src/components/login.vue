@@ -111,11 +111,6 @@ export default {
           userName: this.tel,  
           vCode: this.code,
           userType: 0
-        }, {
-          headers: {
-            Cookie: localStorage.Cookie,
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
         }).then(res => {
           console.log(res)
           if (res.status === 200) {
