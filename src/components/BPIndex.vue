@@ -48,6 +48,25 @@
               </div>
             </div>
           </Card>
+          <Modal
+            v-model="modal1"
+            title="删除"
+            @on-ok="del"
+            @on-cancel="cancel">
+            <p>是否删除此BP？</p>
+          </Modal>
+          <Modal v-model="modal2" width="360">
+            <p slot="header" style="color:#f60;text-align:center">
+              <Icon type="ios-information-circle"></Icon>
+              <span>提示</span>
+            </p>
+            <div style="text-align:center">
+                <p>{{content}}</p>
+            </div>
+            <div slot="footer" style="text-align: center;">
+                <Button type="primary" @click="confirm">确认</Button>
+            </div>
+          </Modal>
         </Content>
         <div v-if="false" class="footimg">
               <Header>
@@ -101,11 +120,11 @@ export default {
         },
         {
           value: '3',
-          label: '未通过'
+          label: '上架中'
         },
         {
           value: '4',
-          label: '上架中'
+          label: '未通过'
         },
         {
           value: '5',
@@ -123,11 +142,56 @@ export default {
         },
         {
           title: "状态",
-          key: "bpStatus"
+          key: "bpStatus",
+          render: (h, params) =>{
+              let _this = this;
+              let texts = '';
+              if(params.row.bpStatus == 1){
+                  texts = "草稿"
+              }else if (params.row.bpStatus == 2) {
+                  texts = "待审核"
+              }else if (params.row.bpStatus == 3) {
+                  texts = "上架中"
+              }else if (params.row.bpStatus == 4) {
+                  texts = "未通过"
+              }else if (params.row.bpStatus == 5) {
+                  texts = "已下架" 
+              }
+              return h('div', {  
+                  props: {
+                      },
+                  },texts)
+              }
         },
         {
           title: "生成邀请码",
-          key: "inviteCode"
+          key: "inviteCode",
+          render: (h, params) =>{
+              let _this = this;
+              let texts = "——";
+            
+              return h('div', {  
+                  props: {
+                      },
+                  },texts)
+              }
+        },
+          {
+          title: "查看人数",
+          key: "views",
+          render: (h, params) =>{
+              let _this = this;
+              let texts = "";
+              if(params.row.views == ''){
+                  texts = "——"
+              } else {
+                texts = params.row.views;
+              }
+              return h('div', {  
+                  props: {
+                      },
+                  },texts)
+              }
         },
         {
           title: "创建时间",
@@ -135,8 +199,9 @@ export default {
         },
         {
           title: "操作",
-          key: "action",
+          key: "bpStatus",
           align: "center",
+          width:250,
           render: (h, params) => {
             return h("div", [
               h(
@@ -147,11 +212,13 @@ export default {
                     size: "small"
                   },
                   style: {
-                    marginRight: "5px"
+                    marginRight: "5px",
+                    float:'left',
+                    display:params.row.bpStatus == 2 || params.row.bpStatus == 3 ?'none':"block"
                   },
                   on: {
                     click: () => {
-                      this.show(params.index);
+                      this.edit(params.index);
                     }
                   }
                 },
@@ -162,7 +229,12 @@ export default {
                 {
                   props: {
                     type: "text",
-                    size: "small"
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                    float:'left',
+                    display:params.row.bpStatus == 3?'none':"block"
                   },
                   on: {
                     click: () => {
@@ -171,19 +243,179 @@ export default {
                   }
                 },
                 "删除"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "text",
+                    size: "small"
+                  },
+                  style: {
+                    marginRight: "5px",
+                    float:'left',
+                    display:params.row.bpStatus != 2?'none':"block"
+                  },
+                  on: {
+                    click: () => {
+                      this.progress(params.index);
+                    }
+                  }
+                },
+                "查看进度"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "text",
+                    size: "small"
+                  },
+                  style: {
+                    marginRight: "5px",
+                    float:'left',
+                    display:params.row.bpStatus != 4?'none':"block"
+                  },
+                  on: {
+                    click: () => {
+                      this.reason(params.index);
+                    }
+                  }
+                },
+                "查看原因"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "text",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                    float:'left',
+                    display:params.row.bpStatus != 3?'none':"block"
+                  },
+                  on: {
+                    click: () => {
+                      this.creat(params.index);
+                    }
+                  }
+                },
+                "生成邀请码"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "text",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                    float:'left',
+                    display:params.row.bpStatus != 5?'none':"block"
+                  },
+                  on: {
+                    click: () => {
+                      this.upTo(params.index);
+                    }
+                  }
+                },
+                "上架"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "text",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                    float:'left',
+                    display:params.row.bpStatus != 3?'none':"block"
+                  },
+                  on: {
+                    click: () => {
+                      this.downTo(params.index);
+                    }
+                  }
+                },
+                "下架"
               )
             ]);
           }
         }
       ],
-      listdata: [
-        
-      ]
+      listdata: [],
+      modal1:false,
+      modal2:false,
+      choise:'',
+      content:''
     };
   },
   methods: {
+    del(){
+      this.$https.get('/bp/businessPlan/deleteBusinessPlan', {  
+        params:{
+          id:this.choise.id
+        }
+      }, {
+        headers: {
+          Cookie: localStorage.Cookie,
+          'Content-Type': 'application/json'
+        }
+      }).then(res => {
+        console.log(res.data)
+        this.getBPList();
+        this.choise = ''
+      });
+    },
+    cancel(){
+      this.modal1 = false;
+    },
+    confirm(){
+      this.modal2 = false;
+    },
+    downTo(index){
+      this.typechange(this.listdata[index].id)
+    },
+    upTo(index){
+      this.typechange(this.listdata[index].id)
+    },
+    typechange(id){
+      this.$https.post('/bp/businessPlan/updateBusinessPlan', {
+        bpStatus: 2,
+        id:id
+      }, {
+        headers: {
+          Cookie: localStorage.Cookie,
+          'Content-Type': 'application/json'
+        }
+      }).then(res => {
+        this.getBPList();
+      });
+    },
+    creat(index){
+      this.modal2 = true;
+      this.content = '该功能即将上线，敬请期待';
+    },
+    reason(index){
+      this.modal2 = true;
+      this.content = '因'+this.listdata[index].failReason+'，该BP未通过审核，请按要求编辑后，重新提交审核';
+    },
+    progress(index){
+      this.modal2 = true;
+      this.content = '我们将于7个工作日内完成审核';
+    },
+    edit(index){
+      this.$router.push({ path: "/BPMgr/"+ this.listdata[index].id});
+    },
     remove(index) {
-      this.listdata.splice(index, 1);
+      // this.listdata.splice(index, 1);
+      this.choise = this.listdata[index];
+      this.modal1 =true;
     },
     handlePage(value){
       this.pageNum = value;
@@ -212,7 +444,8 @@ export default {
             pageSize: this.pageSize,
             pageNum:this.pageNum,
             keywords:this.keyword,
-            bpStatus:this.bpStatus
+            bpStatus:this.bpStatus,
+            admin:'admin'
           }
         }, {
           headers: {
@@ -223,15 +456,8 @@ export default {
           console.log(res.data)
           this.data = res.data.data.businessPlans;
           this.listdata = this.data.list;
-          for(var i=0;i<this.listdata.length;i++){
-            switch(this.listdata[i].bpStatus){
-                case 1:this.listdata[i].bpStatus = '草稿';break;
-                case 2:this.listdata[i].bpStatus = '待审核';break;
-                case 3:this.listdata[i].bpStatus = '未通过';break;
-                case 4:this.listdata[i].bpStatus = '上架中';break;
-                case 5:this.listdata[i].bpStatus = '已下架';break;
-              }
-          }
+          this.pageTotal = this.data.total;
+          this.pageNum = this.data.pageNum;
         });
     }
   },

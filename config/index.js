@@ -16,12 +16,20 @@ module.exports = {
         assetsSubDirectory: "static",
         assetsPublicPath: "",
         proxyTable: {
+            // '/bp': {
+            //     target: 'https://t.govlan.com:8443/',
+            //     changeOrigin: true,
+            //     secure: false,
+            //     headers: {
+            //         Referer: 'https://t.govlan.com:8443/'
+            //     }
+            // }
             '/bp': {
-                target: 'https://t.govlan.com:8443/',
+                target: 'http://192.168.2.102:8080/',
                 changeOrigin: true,
                 secure: false,
                 headers: {
-                    Referer: 'https://t.govlan.com:8443/'
+                    Referer: 'http://192.168.2.102:8080/'
                 }
             }
         },

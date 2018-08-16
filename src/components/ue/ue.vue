@@ -1,6 +1,6 @@
 <template>
   <div>
-    <script :id=id type="text/plain"></script>
+    <script :id='id' type="text/plain"></script>
   </div>
 </template>
 <script>

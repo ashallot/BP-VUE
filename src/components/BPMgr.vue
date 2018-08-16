@@ -34,32 +34,32 @@
                 <div class="input-cell">
                   <span style="color:red;">*</span>
                   <label>项目名称：</label>
-                  <Input v-model="username" placeholder="请输入项目名称" :maxlength="11" style="width: 500px" />
+                  <Input v-model="projectName" placeholder="请输入项目名称" :maxlength="11" style="width: 500px" />
                   <p style="color:gray;float:left;margin-left:20px;">(请输入2-20个字)</p>
                 </div>
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>项目简介：</label>
-                  <Input v-model="email" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(30字内)" :maxlength="30" style="width: 500px;margin-top: 2px;" />
+                  <Input v-model="projectIntroduce" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(30字内)" :maxlength="30" style="width: 500px;margin-top: 2px;" />
                 </div>
                 <div class="input-cell" style="height: 280px;">
                   <span style="color:red">*</span>
                   <label>项目展示小图：</label>
-                  <p class="tipword">(支持格式：jpg、png，尺寸：290*236，大小在300kb之内)</p>
-                  <div>
-                    <template v-if="smallPIC.status === 'finished'">
-                      <img :src="smallPIC.url">
-                      <div class="demo-upload-list-cover">
-                        <icon type="ios-trash-outline" @click.native="smallRemove(smallPIC)"></icon>
-                      </div>
-                    </template>
-                    <template v-else>
-                      <i-progress v-if="smallPIC.showProgress" :percent="smallPIC.percentage" hide-info></i-progress>
-                    </template>
-                  </div><br>
-                  <upload
+                  <p class="tipword">(支持格式：jpg、png，尺寸：290*236，大小在300kb之内)</p><br>
+                  <div class="demo-upload-list">
+                      <template v-if="smallPIC.status === 'finished'">
+                          <img :src="smallPIC.response.data.fileUrl"   style="width:290px;height:236px;margin-left:10px;margin-top:10px;">
+                          <div class="demo-upload-list-cover" style="height:236px;line-height:236px;">
+                              <Icon type="ios-eye-outline" @click.native="smallView(smallPIC.name)"></Icon>
+                              <Icon type="ios-trash-outline" @click.native="smallRemove(smallPIC)"></Icon>
+                          </div>
+                      </template>
+                      <template v-else>
+                          <Progress v-if="smallPIC.showProgress" :percent="smallPIC.percentage" hide-info></Progress>
+                      </template>
+                  </div>
+                  <upload v-if="smallPIC.status != 'finished'"
                     ref="upload"
-                    :before-upload="handleUpload"
                     :show-upload-list="false"
                     :on-success="smallSuccess"
                     :format="['jpg','png']"
@@ -67,33 +67,35 @@
                     :on-format-error="smallFormatError"
                     :on-exceeded-size="smallMaxSize"
                     multiple
-                    with-credentials
                     type="drag"
-                    action='https://t.govlan.com:8443/bp/file/upload'
-                    :data="{'Cookie': Cookie}"
+                    action='/bp/file/upload'
                     style="display: inline-block;width:290px;height:236px;margin-left:10px;margin-top:10px;">
                     <div style="width: 290px;height:236px;line-height: 236px;">
                       <icon type="md-add" size="60"></icon>
                     </div>
                   </upload>
                   <p style="color:gray;margin-top: 118px;text-align: left;">(尺寸：290*236)</p>
+                  <Modal title="图片预览" v-model="smallvisible">
+                      <img :src="smallPIC.response.data.fileUrl" v-if="smallvisible" style="width: 100%">
+                  </Modal>
                 </div>
                 <div class="input-cell" style="height:420px;">
                   <span style="color:red">*</span>
                   <label>项目封面：</label>
-                  <p class="tipword">(支持格式：jpg、png，尺寸：670*377，大小在300kb之内)</p>
-                  <div>
-                    <template v-if="topPIC.status === 'finished'">
-                      <img :src="topPIC.url">
-                      <div class="demo-upload-list-cover">
-                        <icon type="ios-trash-outline" @click.native="topRemove(topPIC)"></icon>
-                      </div>
-                    </template>
-                    <template v-else>
-                      <i-progress v-if="topPIC.showProgress" :percent="topPIC.percentage" hide-info></i-progress>
-                    </template>
-                  </div><br>
-                  <upload
+                  <p class="tipword">(支持格式：jpg、png，尺寸：670*377，大小在300kb之内)</p><br>
+                  <div class="demo-upload-list">
+                      <template v-if="topPIC.status === 'finished'">
+                          <img :src="topPIC.response.data.fileUrl"   style="width:670px;height:377px;margin-left:10px;margin-top:10px;">
+                          <div class="demo-upload-list-cover" style="height:377px;line-height:377px;">
+                              <Icon type="ios-eye-outline" @click.native="topView(topPIC.name)"></Icon>
+                              <Icon type="ios-trash-outline" @click.native="topRemove(topPIC)"></Icon>
+                          </div>
+                      </template>
+                      <template v-else>
+                          <Progress v-if="topPIC.showProgress" :percent="topPIC.percentage" hide-info></Progress>
+                      </template>
+                  </div>
+                  <upload v-if="topPIC.status != 'finished'"
                     ref="upload"
                     :show-upload-list="false"
                     :on-success="topSuccess"
@@ -103,13 +105,16 @@
                     :on-exceeded-size="topMaxSize"
                     multiple
                     type="drag"
-                    action='api/file/upload'
+                    action='/bp/file/upload'
                     style="display: inline-block;width:670px;height:377px;margin-left:10px;margin-top:10px;">
                     <div style="width: 670px;height:377px;line-height: 377px;">
                       <icon type="md-add" size="60"></icon>
                     </div>
                   </upload>
                   <p style="color:gray;margin-top: 189px;text-align: left;">(尺寸：670*377)</p>
+                  <Modal title="图片预览" v-model="topvisible">
+                      <img :src="topPIC.response.data.fileUrl" v-if="topvisible" style="width: 100%">
+                  </Modal>
                 </div>
                 <div class="input-cell">
                   <span style="color:red">*</span>
@@ -123,10 +128,14 @@
                     :max-size="512000"
                     :on-format-error="musicFormatError"
                     :on-exceeded-size="musicMaxSize"
-                    action='api/file/upload'
+                    multiple
+                    type="drag"
+                    action='/bp/file/upload'
                     style="display: inline-block;margin-left:10px;margin-top:10px;">
                     <Button type="error" icon="ios-cloud-upload-outline">上传视频/音频</Button>
                   </upload>
+                  <div style="margin-top: 15px;margin-left: 10px;" v-if="music.status == 'finished'">已上传：{{music.name}}<img @click="musicRemove(music)" style="height: 15px;" src="../assets/del.png" alt=""></div>
+                   
                 </div>
                 <div class="input-cell">
                   <span style="color:red">*</span>
@@ -149,32 +158,50 @@
                 <div class="input-cell">
                   <span style="color:red;">*</span>
                   <label>公司或团队名称：</label>
-                  <Input v-model="projectName" placeholder="请输入公司或团队名称" style="width: 500px" />
+                  <Input v-model="companyName" placeholder="请输入公司或团队名称" style="width: 500px" />
                 </div>
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>团队成员：</label><br>
-                  <div v-for="(item,index) in teamList" :key="index" style="overflow:hidden;width:100%; height: auto; margin: 10px;display: flex;flex-direction:row;">
+                  <div v-for="(item,index) in bpTeams" :key="index" style="overflow:hidden;width:100%; height: auto; margin: 10px;display: flex;flex-direction:row;">
                     <div class="headpic">
-                      <img :src="item.headpic" alt="">
+                      <div class="demo-upload-list">
+                        <template v-if="item.headpic.status === 'finished'">
+                            <img :src="item.headpic.response.data.fileUrl"   style="width:100px;height:100px;">
+                        </template>
+                      </div>
+                      <upload v-if="item.headpic.status != 'finished'"
+                        ref="upload"
+                        :show-upload-list="false"
+                        :on-success="(res,file)=> headPicSuccess(index, res,file)"
+                        :format="['jpg','png']"
+                        :on-format-error="headPicFormatError"
+                        multiple
+                        type="drag"
+                        action='/bp/file/upload'
+                        style="display: inline-block;width:100px;height:100px;margin-left:10px;margin-top:10px;">
+                        <div style="width: 100px;height:100px;line-height: 100px;">
+                          <icon type="md-add" size="40"></icon>
+                        </div>
+                      </upload>
                     </div>
                     <div class="memberInfo">
                       <div style="display: flex; flex-direction: row;">
                         <div class="input-cell" style="display: flex; flex-direction: row;flex: 1;padding-right: 4px;">
                           <span style="color:red;">*</span>
                           <span style="width: 80px;">姓名：</span>
-                          <Input v-model="item.name" placeholder="请输入团队成员姓名" />
+                          <Input v-model="item.userName" placeholder="请输入团队成员姓名" />
                         </div>
                         <div class="input-cell" style="float:right; display: flex; flex-direction: row;flex: 1;padding-left: 4px;">
                           <span style="color:red;">*</span>
                           <span style="width: 80px;">角色：</span>
-                          <Input v-model="item.actor" placeholder="请输入在公司职位或团队中角色" />
+                          <Input v-model="item.roles" placeholder="请输入在公司职位或团队中角色" />
                         </div>
                       </div>
                       <div class="input-cell" style="display: flex; flex-direction: row;">
                         <span style="color:red">*</span>
                         <span style="width: 68px;">介绍：</span>
-                        <Input v-model="item.introduction" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(150字内)" :maxlength="30" style="flex: 1; margin-top: 2px;" />
+                        <Input v-model="item.introduce" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(150字内)" :maxlength="30" style="flex: 1; margin-top: 2px;" />
                       </div>
                     </div>
                     <div @click="delMember(index)" style="margin-left: 20px;cursor:pointer;">
@@ -203,10 +230,12 @@
                     :max-size="512000"
                     :on-format-error="pptFormatError"
                     :on-exceeded-size="pptMaxSize"
-                    action='api/file/upload'
+                    action='/bp/file/upload'
                     style="display: inline-block;margin-left:10px;margin-top:10px;">
                     <Button type="error" icon="ios-cloud-upload-outline">上传PPT</Button>
                   </upload>
+                  <div style="margin-top: 15px;margin-left: 10px;" v-if="ppt.status == 'finished'">已上传：{{ppt.name}}<img @click="pptRemove(ppt)" style="height: 15px;" src="../assets/del.png" alt=""></div>
+                   
                 </div>
               </div>
               <div class="container">
@@ -251,9 +280,9 @@ export default {
     return {
       Cookie: localStorage.Cookie,
       id: "",
-      username: "",
-      email: "",
-      team: "",
+      projectName: "",
+      projectIntroduce: "",
+      companyName:'',
       modal1: true,
       modal2: true,
       modal3: true,
@@ -264,14 +293,7 @@ export default {
       topPICName: "",
       topvisible: false,
       projectName: "",
-      teamList: [
-        {
-          headpic: "../../static/head.png",
-          name: "",
-          actor: "",
-          introduction: ""
-        }
-      ],
+      bpTeams: [],
       defaultMsg:'',
       config: {
         initialFrameWidth: null,
@@ -279,33 +301,22 @@ export default {
       },
       ue: "ue",
       UEcontent:'',
-      file: ''
+      file: '',
+      data:'',
+      ppt:'',
+      music:''
     };
   },
   methods: {
-    handleUpload (file) { // 保存需要上传的文件
-        this.smallPIC = file
-        console.log(this.smallPIC)
-        // this.uploadFile()
-        return false;
+    smallView (name) {
+        this.smallPICName = name;
+        this.smallvisible = true;
     },
-    uploadFile () {
-      // 上传文件
-      var formdata = new FormData();
-      formdata.append('file', this.smallPIC);
-      this.$https.post("/bp/file/upload", formdata).then((res) => {
-        console.log(res)
-      })
-    },
-    smallRemove(file) {
-      const fileList = this.$refs.upload.fileList;
-      this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
+    smallRemove (file) {
+      this.smallPIC = [];
     },
     smallSuccess(res, file) {
-      debugger
-      file.url =
-        "https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar";
-      file.name = "7eb99afb9d5f317c912f08b5212fd69a";
+      this.smallPIC = file;
     },
     smallFormatError(file) {
       this.$Notice.warning({
@@ -319,6 +330,13 @@ export default {
         desc: "文件" + file.name + "太大, 请选择不超过300kb的文件"
       });
     },
+    musicRemove (file) {
+      this.music = [];
+      console.log(this.music)
+    },
+    musicSuccess(res, file) {
+      this.music = file;
+    },
     musicFormatError(file) {
       this.$Notice.warning({
         title: "文件格式不正确！",
@@ -331,15 +349,16 @@ export default {
         desc: "文件" + file.name + "太大, 请选择不超过500Mb的文件"
       });
     },
-
-    topRemove(file) {
-      const fileList = this.$refs.upload.fileList;
-      this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
+    
+    topView (name) {
+        this.topPICName = name;
+        this.topvisible = true;
+    },
+    topRemove (file) {
+      this.topPIC = [];
     },
     topSuccess(res, file) {
-      file.url =
-        "https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar";
-      file.name = "7eb99afb9d5f317c912f08b5212fd69a";
+      this.topPIC = file;
     },
     topFormatError(file) {
       this.$Notice.warning({
@@ -353,21 +372,11 @@ export default {
         desc: "文件" + file.name + "太大, 请选择不超过500MB的文件"
       });
     },
-    musicSuccess(res, file) {
-      file.url =
-        "https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar";
-      file.name = "7eb99afb9d5f317c912f08b5212fd69a";
-    },
-    musicMaxSize(file) {
-      this.$Notice.warning({
-        title: "超出文件大小限制！",
-        desc: "文件" + file.name + "太大, 请选择不超过500MB的文件"
-      });
+    pptRemove (file) {
+      this.ppt = [];
     },
     pptSuccess(res, file) {
-      file.url =
-        "https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar";
-      file.name = "7eb99afb9d5f317c912f08b5212fd69a";
+      this.ppt = file;
     },
     pptFormatError(file) {
       this.$Notice.warning({
@@ -381,6 +390,18 @@ export default {
         desc: "文件" + file.name + "太大, 请选择不超过500MB的文件"
       });
     },
+    headPicSuccess(index,res, file) {
+      console.log(index,res,file)
+      this.bpTeams[index].headpic = file;
+    },
+    headPicFormatError(file) {
+      this.$Notice.warning({
+        title: "文件格式不正确！",
+        desc: "文件格式" + file.name + " 不正确, 请选择.jpg或.png的文件"
+      });
+    },
+
+    
     panel(p) {
       switch (p) {
         case 1:
@@ -395,27 +416,164 @@ export default {
       }
     },
     cancel() {},
-    save() {},
-    submit() {
-      this.UEcontent = this.$refs.ue.getUEContentTxt();
+    save() {
+      if(this.id!=0){
+        this.editBP(1)
+      }else{
+        this.uploadBP(1)
+      }
     },
-    logout() {},
+    submit() {
+      if(this.id!=0){
+        this.editBP(2)
+      }else{
+        this.uploadBP(2)
+      }
+    },
+    editBP(bpStatus){
+      for(var i=0;i<this.bpTeams.length;i++){
+        this.bpTeams[i].headPic = this.bpTeams[i].headpic.response.data.fileName?this.bpTeams[i].headpic.response.data.fileName:'';
+      }
+      this.$https.post('/bp/businessPlan/updateBusinessPlan', {
+          bpStatus: bpStatus,
+          id:this.id,
+          projectName:this.projectName,
+          projectIntroduce:this.projectIntroduce,
+          projectDetail:this.$refs.ue.getUEContent(),
+          companyName:this.companyName,
+          bpTeams:this.bpTeams,
+          mCover:this.smallPIC.length!= 0?this.smallPIC.response.data.fileName:'',
+          lCover:this.topPIC.length!= 0?this.topPIC.response.data.fileName:'',
+          mediaPath:this.music.name?this.music.name:'',
+          ppt:this.ppt.name?this.ppt.name:''
+        }, {
+          headers: {
+            Cookie: localStorage.Cookie,
+            'Content-Type': 'application/json'
+          }
+        }).then(res => {
+          console.log(res)
+            this.$router.push({path: '/BPIndex'})
+        });
+    },
+    uploadBP(bpStatus){
+      if(this.bpTeams.length != 0){
+        for(var i=0;i<this.bpTeams.length;i++){
+          this.bpTeams[i].headPic = this.bpTeams[i].headpic.response.data.fileName?this.bpTeams[i].headpic.response.data.fileName:'';
+        }
+      }
+      this.$https.post('/bp/businessPlan/addBusinessPlanTeam', {
+          bpStatus: bpStatus,
+          projectName:this.projectName,
+          projectIntroduce:this.projectIntroduce,
+          projectDetail:this.$refs.ue.getUEContent(),
+          companyName:this.companyName,
+          bpTeams:this.bpTeams,
+          mCover:this.smallPIC.length!= 0?this.smallPIC.response.data.fileName:'',
+          lCover:this.topPIC.length!= 0?this.topPIC.response.data.fileName:'',
+          mediaPath:this.music.name?this.music.name:'',
+          ppt:this.ppt.name?this.ppt.name:''
+
+        }, {
+          headers: {
+            Cookie: localStorage.Cookie,
+            'Content-Type': 'application/json'
+          }
+        }).then(res => {
+          console.log(res)
+          this.$router.push({path: '/BPIndex'})
+        });
+    },
+    logout() {
+      // http
+      localStorage.removeItem('Cookie');
+      this.$router.push({path: '/login'})
+    },
     addMember() {
-      this.teamList.push({
-        headpic: "../../static/head.png",
-        name: "",
-        actor: "",
-        introduction: ""
+      this.bpTeams.push({
+        headpic: "",
+        userName: "",
+        roles: "",
+        introduce: ""
       });
     },
     delMember(index) {
-      this.teamList.splice(index, 1);
+      this.$https.get('/bp/businessPlan/deleteBusinessPlanTeam', {  
+        params:{
+          id: this.bpTeams[index].id
+        }
+      }, {
+        headers: {
+          Cookie: localStorage.Cookie,
+          'Content-Type': 'application/json'
+        }
+      }).then(res => {
+        console.log(res.data)
+        this.bpTeams.splice(index, 1);
+      });
+    },
+    getDetail(id){
+      this.$https.get('/bp/businessPlan/getBusinessPlan', {
+          params:{
+            id: id
+          }
+        }, {
+          headers: {
+            Cookie: localStorage.Cookie,
+            'Content-Type': 'application/json'
+          }
+        }).then(res => {
+          this.data = res.data.data;
+          this.projectName=this.data.businessPlan.projectName;
+          this.projectIntroduce=this.data.businessPlan.projectIntroduce;
+          this.defaultMsg=this.data.businessPlan.projectDetail;
+          this.companyName=this.data.businessPlan.companyName;
+          this.bpTeams=this.data.businessPlan.bpTeams;
+          for(var i=0;i<this.bpTeams.length;i++){
+            var temp = this.bpTeams[i].headPic;
+            this.bpTeams[i].headpic = {
+              status:"finished",
+              response:{
+                data:{
+                  fileUrl:temp
+                }
+              }
+            }
+          };
+          this.smallPIC = {
+            status:"finished",
+            response:{
+              data:{
+                fileUrl:this.data.businessPlan.mCover,
+                fileName:this.data.businessPlan.originMCover
+              }
+            }
+          };
+          this.topPIC = {
+            status:"finished",
+            response:{
+              data:{
+                fileUrl:this.data.businessPlan.lCover,
+                fileName:this.data.businessPlan.originLCover
+              }
+            }
+          };
+          this.music = {
+            name:this.data.businessPlan.originMediaPath,
+            status:this.data.businessPlan.originMediaPath==''?'':"finished"
+          };
+          this.ppt = {
+            name:this.data.businessPlan.originPpt,
+            status:this.data.businessPlan.originPpt==''?'':"finished"
+          };
+        });
     }
   },
   updated() {},
   mounted() {
     this.id = this.$route.params.BPId;
     this.Cookie = localStorage.Cookie;
+    if(this.id != 0) this.getDetail(this.id);
   }
 };
 </script>
@@ -547,7 +705,7 @@ export default {
   flex-direction: row;
   align-items: center;
 }
-.headpic img {
+.headpic div img {
   height: 100px;
   width: 100px;
   border-radius: 50px;
@@ -584,5 +742,36 @@ export default {
 .ivu-card-body {
     padding: 0px !important;
 }
-
+.demo-upload-list{
+    display: inline-block;
+    text-align: center;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    position: relative;
+    box-shadow: 0 1px 1px rgba(0,0,0,.2);
+}
+.demo-upload-list img{
+    width: 100%;
+    height: 100%;
+}
+.demo-upload-list-cover{
+    display: none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,.6);
+}
+.demo-upload-list:hover .demo-upload-list-cover{
+    display: block;
+}
+.demo-upload-list-cover i{
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    margin: 0 2px;
+}
 </style>
