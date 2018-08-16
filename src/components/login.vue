@@ -111,11 +111,14 @@ export default {
           userName: this.tel,  
           vCode: this.code,
           userType: 0
+<<<<<<< HEAD
         }, {
           headers: {
             Cookie: localStorage.Cookie,
             'Content-Type': 'application/json'
           }
+=======
+>>>>>>> 4adc32620d87e756bf2ba485ced3946959b1246a
         }).then(res => {
           console.log(res)
           if (res.status === 200) {

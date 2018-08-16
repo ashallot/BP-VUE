@@ -23,6 +23,7 @@ axios.defaults.timeout = 60000
 axios.defaults.withCredentials = true
 
 axios.interceptors.request.use((config) => {
+<<<<<<< HEAD
     // if (config.url.indexOf('sendSms') == -1) {
     //     config.headers = {
     //         'Content-Type': 'application/ld+json',
@@ -36,10 +37,21 @@ axios.interceptors.request.use((config) => {
     // }
     if (config.method === 'post') {
             config.headers = {
+=======
+    if (config.url.indexOf('sendSms') == -1) {
+        config.headers = {
+>>>>>>> 4adc32620d87e756bf2ba485ced3946959b1246a
             'Content-Type': 'application/ld+json',
             'set-cookie': localStorage.Cookie,
             'Cookie': localStorage.Cookie
         }
+<<<<<<< HEAD
+=======
+    } else {
+        config.headers = {
+            'Content-Type': 'application/ld+json'
+        }
+>>>>>>> 4adc32620d87e756bf2ba485ced3946959b1246a
     }
     return config
 }, (error) => {
