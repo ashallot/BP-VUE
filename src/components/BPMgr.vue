@@ -132,8 +132,10 @@
                   <span style="color:red">*</span>
                   <label>项目详情：</label>
                   <p class="tipword">(为保证良好的阅读体验，建议上传宽度为750px，大小在2M之内图片)</p>
-                  <div class="editor-container">
-                    <UE :defaultMsg='defaultMsg' :config='config' :id='ue' ref="ue"></UE>
+                  <div class="components-container" style="width:100%">
+                    <div class="editor-container" style="width:100%">
+                      <UE :defaultMsg='defaultMsg' :config='config' :id='ue' ref="ue" style="width:100%"></UE>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -282,14 +284,15 @@ export default {
   },
   methods: {
     handleUpload (file) { // 保存需要上传的文件
-        this.file = file
-        this.uploadFile()
+        this.smallPIC = file
+        console.log(this.smallPIC)
+        // this.uploadFile()
         return false;
     },
     uploadFile () {
       // 上传文件
       var formdata = new FormData();
-      formdata.append('file', this.file);
+      formdata.append('file', this.smallPIC);
       this.$https.post("/bp/file/upload", formdata).then((res) => {
         console.log(res)
       })

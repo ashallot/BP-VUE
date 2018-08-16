@@ -48,7 +48,7 @@
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>请填写公司或团队名称：</label>
-                  <Input v-model="team" placeholder="请输入公司或团队" style="width: 500px;margin-left: 95px !important;" />
+                  <Input v-model="team" placeholder="请输入公司或团队" style="width: 500px;margin-left: 108px !important;" />
                   <div class="warn">
                     <div style="float:left;margin-left:0"><img src="../assets/warning.png" alt=""></div>
                     <span>请填写公司或团队名称</span>
@@ -89,7 +89,7 @@
         <span>提示</span>
       </p>
       <div style="text-align:center">
-        <p>请完整的填写您的信息！</p>
+        <p>请填写正确的信息！</p>
       </div>
       <div slot="footer">
         <Button type="error" size="large" long @click="confirm">确定</Button>
@@ -104,20 +104,39 @@ export default {
       username: "",
       email: "",
       team: "",
-      modal:false
+      modal:false      
     };
   },
   methods: {
     submit() {
-      if(this.username == '' || this.email == '' || this.team == ''){
+      var reg = new RegExp("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$");
+      if(this.username == '' || this.email == '' || this.team == '' || !reg.test(this.email)){
         this.modal = true;
       }else{
         this.modal = false;
         // http
+        this.codeValidate = false;
+        this.$https.post('/bp/user/login', {  
+          userName: this.tel,  
+          vCode: this.code,
+          userType: 0
+        }, {
+          headers: {
+            Cookie: localStorage.Cookie,
+            'Content-Type': 'application/json'
+          }
+        }).then(res => {
+          console.log(res)
+          if (res.status === 200) {
+            this.$router.push({path: '/BPIndex'})
+          }
+        });
       }
     },
     logout() {
       // http
+      localStorage.removeItem('Cookie');
+      this.$router.push({path: '/login'})
     },
     confirm(){
       this.modal = false;

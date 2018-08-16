@@ -34,6 +34,13 @@ axios.interceptors.request.use((config) => {
     //         'Content-Type': 'application/ld+json'
     //     }
     // }
+    if (config.method === 'post') {
+            config.headers = {
+            'Content-Type': 'application/ld+json',
+            'set-cookie': localStorage.Cookie,
+            'Cookie': localStorage.Cookie
+        }
+    }
     return config
 }, (error) => {
     return Promise.reject(error)
@@ -46,15 +53,15 @@ axios.interceptors.response.use(function (response) {
     }
     iView.LoadingBar.finish()
     return response
-    }, function (error) {
+}, function (error) {
     // Do something with response error
     var response = error.response
     console.log(error)
     // 需要登录
     if (response.status === 401) {
-        
+
     } else if (response.status === 400) {
-        
+
     } else if (response.status === 500) {
         iView.Message.error('网络服务器忙~请稍后再试！')
     }

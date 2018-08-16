@@ -37,7 +37,7 @@
                     <Icon type="ios-search" slot="prefix"></Icon>
                   </Input>
                   <span style="margin-left: 20px; margin-right: 20px;">BP状态</span>
-                  <Select v-model="bpStatus" style="width:200px">
+                  <Select v-model="bpStatus" style="width:200px" @on-change="selectChange" >
                     <Option v-for="item in bpStatusList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                   </Select>
                   <Button size="large" class="uploadBtn" @click="upload">上传BP</Button>
@@ -79,12 +79,13 @@
 export default {
   data() {
     return {
-      data: "1",
+      data: '',
       keyword: "",
       type: "全部",
-      pageTotal:15,
+      pageTotal:10,
       pageNum:1,
-      bpStatus: '',
+      pageSize:10,
+      bpStatus: '0',
       bpStatusList: [
         {
           value: '0',
@@ -118,11 +119,11 @@ export default {
         },
         {
           title: "团队名称",
-          key: "projectIntroduce"
+          key: "companyName"
         },
         {
           title: "状态",
-          key: "projectDetail"
+          key: "bpStatus"
         },
         {
           title: "生成邀请码",
@@ -130,12 +131,11 @@ export default {
         },
         {
           title: "创建时间",
-          key: "createAt"
+          key: "formatCreateAt"
         },
         {
           title: "操作",
           key: "action",
-          width: 400,
           align: "center",
           render: (h, params) => {
             return h("div", [
@@ -186,50 +186,57 @@ export default {
       this.listdata.splice(index, 1);
     },
     handlePage(value){
-      console.log(value)
+      this.pageNum = value;
+      this.getBPList();
     },
     handleSearch() {
-      console.log(this.keyword);
-      // this.$http.post('url',{
-      //   keyword:this.keyword
-      // },{
-      //   emulateJSON:true
-      // }).then(function(response){
-      //   this.data = response.data;
-      // },function(response){
-      //   console.log(response)
-      // });
+      this.getBPList();
     },
-    choiseType(type) {
-      this.type = type;
+    selectChange(event) {
+      console.log(event)
+      this.bpStatus = event;
       // http
-      // this.$http.post('url',{
-      //   type:this.type
-      // },{
-      //   emulateJSON:true
-      // }).then(function(response){
-      //   this.data = response.data;
-      // },function(response){
-      //   console.log(response)
-      // });
+      this.getBPList();
     },
     upload() {
       this.$router.push({ path: "/BPMgr/0" });
     },
-    logout() {},
+    logout() {
+      // http
+      localStorage.removeItem('Cookie');
+      this.$router.push({path: '/login'})
+    },
     getBPList() {
-      this.$http.get("url").then(
-        function(response) {
-          this.data = response.data.list;
-        },
-        function(response) {
-          console.log(response);
-        }
-      );
+      this.$https.get('/bp/businessPlan/queryBusinessPlan', {  
+          params:{
+            pageSize: this.pageSize,
+            pageNum:this.pageNum,
+            keywords:this.keyword,
+            bpStatus:this.bpStatus
+          }
+        }, {
+          headers: {
+            Cookie: localStorage.Cookie,
+            'Content-Type': 'application/json'
+          }
+        }).then(res => {
+          console.log(res.data)
+          this.data = res.data.data.businessPlans;
+          this.listdata = this.data.list;
+          for(var i=0;i<this.listdata.length;i++){
+            switch(this.listdata[i].bpStatus){
+                case 1:this.listdata[i].bpStatus = '草稿';break;
+                case 2:this.listdata[i].bpStatus = '待审核';break;
+                case 3:this.listdata[i].bpStatus = '未通过';break;
+                case 4:this.listdata[i].bpStatus = '上架中';break;
+                case 5:this.listdata[i].bpStatus = '已下架';break;
+              }
+          }
+        });
     }
   },
   mounted() {
-    // this.getBPList()
+    this.getBPList()
   }
 };
 </script>

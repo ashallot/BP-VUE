@@ -114,7 +114,7 @@ export default {
         }, {
           headers: {
             Cookie: localStorage.Cookie,
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/json'
           }
         }).then(res => {
           console.log(res)
