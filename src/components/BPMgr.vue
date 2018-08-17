@@ -132,9 +132,14 @@
                     type="drag"
                     action='/bp/file/upload'
                     style="display: inline-block;margin-left:10px;margin-top:10px;">
-                    <Button class="btn-default">上传视频/音频</Button>
+                    <Button class="btn-default" type="error">上传视频/音频</Button>
                   </upload>
-                  <div style="margin-top: 15px;margin-left: 10px;" v-if="music.status == 'finished'">已上传：{{music.name}}<img @click="musicRemove(music)" style="height: 15px;" src="../assets/del.png" alt=""></div>
+                  <div style="margin-top: 10px;margin-left: 10px;" v-if="music.status == 'finished'">
+                    <div style="background-color: #fef7f7;padding-left:5px;">
+                      <div style="height: 38px;line-height:38px;">已上传：{{music.name}}</div>
+                      <img @click="musicRemove(music)" style="height: 15px;" src="../assets/del.png" alt="">
+                    </div>
+                  </div>
                    
                 </div>
                 <div class="input-cell">
@@ -235,7 +240,12 @@
                     style="display: inline-block;margin-left:10px;margin-top:10px;">
                     <Button class="btn-default" type="error">上传PPT</Button>
                   </upload>
-                  <div style="margin-top: 15px;margin-left: 10px;" v-if="ppt.status == 'finished'">已上传：{{ppt.name}}<img @click="pptRemove(ppt)" style="height: 15px;" src="../assets/del.png" alt=""></div>
+                  <div style="margin-top: 10px;margin-left: 10px;" v-if="ppt.status == 'finished'">
+                    <div style="background-color: #fef7f7;padding-left:5px;">
+                      <div style="height: 38px;line-height:38px;">已上传：{{ppt.name}}</div>
+                      <img @click="pptRemove(ppt)" style="height: 15px;" src="../assets/del.png" alt="">
+                    </div>
+                  </div>
                    
                 </div>
               </div>
@@ -381,7 +391,7 @@ export default {
     topMaxSize(file) {
       this.$Notice.warning({
         title: "超出文件大小限制！",
-        desc: "文件" + file.name + "太大, 请选择不超过500MB的文件"
+        desc: "文件" + file.name + "太大, 请选择不超过300k的文件"
       });
     },
     pptRemove (file) {
@@ -452,7 +462,7 @@ export default {
       } else if (this.projectIntroduce == null || this.projectIntroduce.trim().length == 0) {
         tips = '请输入项目简介'
         validated = false
-      } else if (this.projectDetail == null || this.projectDetail.trim().length == 0) {
+      } else if (this.$refs.ue.getUEContent() == null || this.$refs.ue.getUEContent().trim().length == 0) {
         tips = '请输入项目详细介绍'
         validated = false
       } else if (this.companyName == null || this.companyName.trim().length == 0) {
@@ -479,11 +489,16 @@ export default {
       return validated
     },
     editBP(bpStatus){
+      debugger
       if (!this.validateBP(false)) {
         return
       }
-      for(var i=0;i<this.bpTeams.length;i++){
-        this.bpTeams[i].headPic = this.bpTeams[i].headpic.response.data.fileName?this.bpTeams[i].headpic.response.data.fileName:'';
+      for(var i=0;i<this.bpTeams.length;i++) {
+        var headPic = ''
+        if (this.bpTeams[i].headpic != null && this.bpTeams[i].headpic.response != null && this.bpTeams[i].headpic.response.data != null) {
+          headPic = this.bpTeams[i].headpic.response.data.fileName;
+        }
+        this.bpTeams[i].headPic = headPic;
       }
       this.$https.post('/bp/businessPlan/updateBusinessPlan', {
           bpStatus: bpStatus,
@@ -504,16 +519,26 @@ export default {
           }
         }).then(res => {
           console.log(res)
+          if (res.data.code == 200) {
             this.$router.push({path: '/BPIndex'})
+          } else {
+            this.$Message.error('BP修改失败！请重试！')
+          }
+            
         });
     },
     uploadBP(bpStatus){
+      debugger
       if (!this.validateBP(true)) {
         return
       }
       if(this.bpTeams.length != 0){
         for(var i=0;i<this.bpTeams.length;i++){
-          this.bpTeams[i].headPic = this.bpTeams[i].headpic.response.data.fileName?this.bpTeams[i].headpic.response.data.fileName:'';
+          var headPic = ''
+          if (this.bpTeams[i].headpic != null && this.bpTeams[i].headpic.response != null && this.bpTeams[i].headpic.response.data != null) {
+            headPic = this.bpTeams[i].headpic.response.data.fileName;
+          }
+          this.bpTeams[i].headPic = headPic;
         }
       }
       this.$https.post('/bp/businessPlan/addBusinessPlanTeam', {
@@ -535,7 +560,12 @@ export default {
           }
         }).then(res => {
           console.log(res)
-          this.$router.push({path: '/BPIndex'})
+          if (res.data.code == 200) {
+            this.$router.push({path: '/BPIndex'})
+          } else {
+            this.$Message.error('BP添加失败！请重试！')
+          }
+          
         });
     },
     logout() {
@@ -567,6 +597,7 @@ export default {
       });
     },
     getDetail(id){
+      const that = this
       this.$https.get('/bp/businessPlan/getBusinessPlan', {
           params:{
             id: id
@@ -577,15 +608,16 @@ export default {
             'Content-Type': 'application/json'
           }
         }).then(res => {
-          this.data = res.data.data;
-          this.projectName=this.data.businessPlan.projectName;
-          this.projectIntroduce=this.data.businessPlan.projectIntroduce;
-          this.defaultMsg=this.data.businessPlan.projectDetail;
-          this.companyName=this.data.businessPlan.companyName;
-          this.bpTeams=this.data.businessPlan.bpTeams;
-          for(var i=0;i<this.bpTeams.length;i++){
-            var temp = this.bpTeams[i].headPic;
-            this.bpTeams[i].headpic = {
+          that.data = res.data.data;
+          that.projectName = that.data.businessPlan.projectName;
+          that.projectIntroduce = that.data.businessPlan.projectIntroduce;
+          that.defaultMsg = that.data.businessPlan.projectDetail;
+          debugger
+          that.companyName = that.data.businessPlan.companyName;
+          that.bpTeams = that.data.businessPlan.bpTeams;
+          for(var i = 0; i < that.bpTeams.length; i++){
+            var temp = that.bpTeams[i].headPic;
+            that.bpTeams[i].headpic = {
               status:"finished",
               response:{
                 data:{
@@ -594,31 +626,31 @@ export default {
               }
             }
           };
-          this.smallPIC = {
+          that.smallPIC = {
             status:"finished",
             response:{
               data:{
-                fileUrl:this.data.businessPlan.mCover,
-                fileName:this.data.businessPlan.originMCover
+                fileUrl:that.data.businessPlan.mCover,
+                fileName:that.data.businessPlan.originMCover
               }
             }
           };
-          this.topPIC = {
+          that.topPIC = {
             status:"finished",
             response:{
               data:{
-                fileUrl:this.data.businessPlan.lCover,
-                fileName:this.data.businessPlan.originLCover
+                fileUrl:that.data.businessPlan.lCover,
+                fileName:that.data.businessPlan.originLCover
               }
             }
           };
-          this.music = {
-            name:this.data.businessPlan.originMediaPath,
-            status:this.data.businessPlan.originMediaPath==''?'':"finished"
+          that.music = {
+            name:that.data.businessPlan.originMediaPath,
+            status:that.data.businessPlan.originMediaPath==''?'':"finished"
           };
-          this.ppt = {
-            name:this.data.businessPlan.originPpt,
-            status:this.data.businessPlan.originPpt==''?'':"finished"
+          that.ppt = {
+            name:that.data.businessPlan.originPpt,
+            status:that.data.businessPlan.originPpt==''?'':"finished"
           };
         });
     }

@@ -28,4 +28,8 @@ export default {
     float: right !important;
 }
 
+textarea.ivu-input {
+  font-size: 12px;
+}
+
 </style>

@@ -30,8 +30,8 @@
                 <div class="input-cell">
                   <span style="color:red;">*</span>
                   <label>请填写真实姓名：</label>
-                  <Input v-model="username" placeholder="请输入姓名" style="width: 500px" />
-                  <div class="warn">
+                  <Input @on-change="realNameChanged" v-model="realName" placeholder="请输入姓名" style="width: 500px" />
+                  <div v-if="!realNameValidate" class="warn">
                     <div style="float:left;margin-left:0"><img src="../assets/warning.png" alt=""></div>
                     <span>请填写真实姓名</span>
                   </div>
@@ -39,8 +39,8 @@
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>请填写常用邮箱：</label>
-                  <Input v-model="email" placeholder="请输入邮箱" style="width: 500px" />
-                  <div class="warn">
+                  <Input @on-change="emailChanged" v-model="email" placeholder="请输入邮箱" style="width: 500px" />
+                  <div v-if="!emailValidate" class="warn">
                     <div style="float:left;margin-left:0"><img src="../assets/warning.png" alt=""></div>
                     <span>请填写常用邮箱/请填写正确的邮箱地址</span>
                   </div>
@@ -48,8 +48,8 @@
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>请填写公司或团队名称：</label>
-                  <Input v-model="team" placeholder="请输入公司或团队" style="width: 500px;margin-left: 108px !important;" />
-                  <div class="warn">
+                  <Input @on-change="companyNameChanged" v-model="companyName" placeholder="请输入公司或团队" style="width: 500px;margin-left: 108px !important;" />
+                  <div v-if="!companyNameValidate" class="warn">
                     <div style="float:left;margin-left:0"><img src="../assets/warning.png" alt=""></div>
                     <span>请填写公司或团队名称</span>
                   </div>
@@ -83,18 +83,6 @@
             </Header>
           </div>
     </Layout>
-    <Modal v-model="modal" width="360">
-      <p slot="header" style="color:#f60;text-align:center">
-        <Icon type="ios-information-circle"></Icon>
-        <span>提示</span>
-      </p>
-      <div style="text-align:center">
-        <p>请填写正确的信息！</p>
-      </div>
-      <div slot="footer">
-        <Button type="error" size="large" long @click="confirm">确定</Button>
-      </div>
-    </Modal>
   </div>
 </template>
 <script>
@@ -102,37 +90,57 @@ export default {
   data() {
     return {
       accountName: localStorage.userName,
-      username: "",
+      realName: "",
       email: "",
-      team: "",
-      modal:false      
+      companyName: "",
+      realNameValidate: false,
+      emailValidate: false,
+      companyNameValidate: false
     };
   },
   methods: {
-    submit() {
-      var reg = new RegExp("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$");
-      if(this.username == '' || this.email == '' || this.team == '' || !reg.test(this.email)){
-        this.modal = true;
-      }else{
-        this.modal = false;
-        // http
-        this.codeValidate = false;
-        this.$https.post('/bp/user/login', {  
-          userName: this.tel,  
-          vCode: this.code,
-          userType: 0
-        }, {
-          headers: {
-            Cookie: localStorage.Cookie,
-            'Content-Type': 'application/json'
-          }
-        }).then(res => {
-          console.log(res)
-          if (res.status === 200) {
-            this.$router.push({path: '/BPIndex'})
-          }
-        });
+    realNameChanged () {
+      if (this.realName == '' || this.realName.trim() == '') {
+        this.realNameValidate = false
+      } else {
+        this.realNameValidate = true
       }
+    },
+    emailChanged () {
+      var reg = new RegExp("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$");
+      this.emailValidate = reg.test(this.email)
+    },
+    companyNameChanged () {
+      if (this.companyName == '' || this.companyName.trim() == '') {
+        this.companyNameValidate = false
+      } else {
+        this.companyNameValidate = true
+      }
+    },
+    submit() {
+
+      if (!this.realNameValidate || !this.emailValidate || !this.companyNameValidate) {
+        return
+      }
+
+      this.$https.post('/bp/user/updateUser', {  
+        email: this.email,
+        companyName: this.companyName,
+        realName: this.realName,
+        userType: '1'
+      }, {
+        headers: {
+          Cookie: localStorage.Cookie,
+          'Content-Type': 'application/json'
+        }
+      }).then(res => {
+        console.log(res)
+        if (res.data.code == 200) {
+          this.$router.push({path: '/BPIndex'})
+        } else {
+          this.$Message.error('身份信息设置失败！请重试！')
+        }
+      });
     },
     logout() {
       // http

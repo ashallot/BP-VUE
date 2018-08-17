@@ -118,13 +118,21 @@ export default {
           }
         }).then(res => {
           console.log(res)
-          if (res.status === 200) {
+          if (res.data.code === 200) {
             var Cookie = 'JSESSIONID=' + res.data.data.JSESSIONID
             var user = res.data.data.user
-            localStorage.userName = user.userName
-            localStorage.user = JSON.stringify(user)
-            localStorage.Cookie = Cookie
-            this.$router.push({path: '/BPIndex'})
+            if (user != null) {
+              localStorage.userName = user.userName
+              localStorage.user = JSON.stringify(user)
+              localStorage.Cookie = Cookie
+              if (user.userType != 0) {
+                this.$router.push({path: '/BPIndex'})
+              } else {
+                this.$router.push({path: '/userInfo'})
+              }
+            }
+          } else {
+            this.$Message.error('登录失败！请重试！')
           }
         });
       }

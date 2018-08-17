@@ -360,7 +360,7 @@ export default {
     del(){
       this.$https.get('/bp/businessPlan/deleteBusinessPlan', {  
         params:{
-          id:this.choise.id
+          id: this.choise.id
         }
       }, {
         headers: {
@@ -446,6 +446,7 @@ export default {
     remove(index) {
       const that = this
       // this.listdata.splice(index, 1);
+      this.choise = this.listdata[index];
       this.$Modal.confirm({
           title: '提示',
           content: '<p>' + '您确定要删除“' + this.listdata[index].projectName + '”项目吗？</p>',
@@ -456,7 +457,6 @@ export default {
               
           }
       });
-      // this.choise = this.listdata[index];
       // this.modal1 =true;
     },
     handlePage(value){
@@ -496,10 +496,14 @@ export default {
           }
         }).then(res => {
           console.log(res.data)
-          this.data = res.data.data.businessPlans;
-          this.listdata = this.data.list;
-          this.pageTotal = this.data.total;
-          this.pageNum = this.data.pageNum;
+          if (res.data.code == 200) {
+            this.data = res.data.data.businessPlans;
+            this.listdata = this.data.list;
+            this.pageTotal = this.data.total;
+            this.pageNum = this.data.pageNum;
+          } else {
+            this.$Message.error('数据获取失败！请稍后再试！')
+          }
         });
     }
   },

@@ -16,22 +16,22 @@ module.exports = {
         assetsSubDirectory: "static",
         assetsPublicPath: "",
         proxyTable: {
-            // '/bp': {
-            //     target: 'https://t.govlan.com:8443/',
-            //     changeOrigin: true,
-            //     secure: false,
-            //     headers: {
-            //         Referer: 'https://t.govlan.com:8443/'
-            //     }
-            // }
             '/bp': {
-                target: 'http://192.168.50.188:8080/',
+                target: 'https://t.govlan.com:8443/',
                 changeOrigin: true,
                 secure: false,
                 headers: {
-                    Referer: 'http://192.168.50.188:8080/'
+                    Referer: 'https://t.govlan.com:8443/'
                 }
             }
+            // '/bp': {
+            //     target: 'http://localhost:8080/',
+            //     changeOrigin: true,
+            //     secure: false,
+            //     headers: {
+            //         Referer: 'http://localhost:8080/'
+            //     }
+            // }
         },
         // CSS Sourcemaps off by default because relative paths are "buggy"
         // with this option, according to the CSS-Loader README
