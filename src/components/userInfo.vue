@@ -59,7 +59,7 @@
             </div>
           </Card>
         </Content>
-        <div class="footimg">
+        <div v-if="false" class="footimg">
               <Header>
                 <Menu mode="horizontal"  active-name="1">
                     <div style="height:60px;float:left;margin-left:20px;">

@@ -12,7 +12,7 @@
                     <span>退出系统</span>
                   </div>
                   <div style="float:right;margin-right: 5px;">|</div>
-                  <div style="float:right;margin-right: 5px;">admin</div>
+                  <div style="float:right;margin-right: 5px;">{{userName}}</div>
                   <div style="height:60px;"><img style="margin-top: 5px;" src="../assets/head.png" alt=""></div>
                 </div>
             </Menu>
@@ -273,11 +273,16 @@
   </div>
 </template>
 <script>
+import '../../static/UE/ueditor.config.js'
+import '../../static/UE/ueditor.all.min.js'
+import '../../static/UE/lang/zh-cn/zh-cn.js'
+import '../../static/UE/ueditor.parse.min.js'
 import UE from "./ue/ue";
 export default {
   components: { UE },
   data() {
     return {
+      userName: localStorage.userName,
       Cookie: localStorage.Cookie,
       id: "",
       projectName: "",
@@ -774,4 +779,5 @@ export default {
     cursor: pointer;
     margin: 0 2px;
 }
+
 </style>

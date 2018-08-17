@@ -17,31 +17,30 @@ Vue.config.productionTip = false
 Vue.use(iView);
 Vue.use(VueResource)
 if (process.env.NODE_ENV === 'production') {
-    // axios.defaults.baseURL = 'https://t.govlan.com:8443'
-    axios.defaults.baseURL = 'http://192.168.2.102:8080/'
+    axios.defaults.baseURL = 'https://t.govlan.com:8443'
 }
 axios.defaults.timeout = 60000
 axios.defaults.withCredentials = true
 
 axios.interceptors.request.use((config) => {
-    // if (config.url.indexOf('sendSms') == -1) {
-    //     config.headers = {
-    //         'Content-Type': 'application/ld+json',
-    //         'set-cookie': localStorage.Cookie,
-    //         'Cookie': localStorage.Cookie
-    //     }
-    // } else {
-    //     config.headers = {
-    //         'Content-Type': 'application/ld+json'
-    //     }
-    // }
-    if (config.method === 'post') {
-            config.headers = {
+    if (config.url.indexOf('sendSms') == -1) {
+        config.headers = {
             'Content-Type': 'application/ld+json',
             'set-cookie': localStorage.Cookie,
             'Cookie': localStorage.Cookie
         }
+    } else {
+        config.headers = {
+            'Content-Type': 'application/ld+json'
+        }
     }
+    // if (config.method === 'post') {
+    //         config.headers = {
+    //         'Content-Type': 'application/ld+json',
+    //         'set-cookie': localStorage.Cookie,
+    //         'Cookie': localStorage.Cookie
+    //     }
+    // }
     return config
 }, (error) => {
     return Promise.reject(error)

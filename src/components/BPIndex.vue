@@ -12,7 +12,7 @@
                     <span>退出系统</span>
                   </div>
                   <div style="float:right;margin-right: 5px;">|</div>
-                  <div style="float:right;margin-right: 5px;">admin</div>
+                  <div style="float:right;margin-right: 5px;">{{ userName }}</div>
                   <div style="height:60px;"><img style="margin-top: 5px;" src="../assets/head.png" alt=""></div>
                 </div>
             </Menu>
@@ -25,12 +25,12 @@
           </Breadcrumb>
           <Card class="card-box">
             <div style="min-height: 720px;">
-              <div class="blank" v-if="data == ''">
+              <div class="blank" v-if="listdata.length == 0">
                 <img src="../assets/blank.png" alt=""><br>
                 <p style="color: gray;">您还没上传过BP哦~</p><br>
                 <Button size="large" class="uploadBtn" @click="upload">立即上传</Button>
               </div>
-              <div class="container" v-if="data != ''">
+              <div class="container" v-if="listdata.length > 0">
                 <div class="top">
                   <Input v-model="keyword" size="default" placeholder="请输入关键字后回车搜索" style="width: 500px;"
                    @keyup.enter.native="handleSearch()">
@@ -98,12 +98,13 @@
 export default {
   data() {
     return {
+      userName: localStorage.userName,
       data: '',
       keyword: "",
       type: "全部",
-      pageTotal:10,
-      pageNum:1,
-      pageSize:10,
+      pageTotal: 10,
+      pageNum: 1,
+      pageSize: 10,
       bpStatus: '0',
       bpStatusList: [
         {

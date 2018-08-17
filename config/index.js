@@ -25,11 +25,11 @@ module.exports = {
             //     }
             // }
             '/bp': {
-                target: 'http://192.168.2.102:8080/',
+                target: 'http://192.168.50.188:8080/',
                 changeOrigin: true,
                 secure: false,
                 headers: {
-                    Referer: 'http://192.168.2.102:8080/'
+                    Referer: 'http://192.168.50.188:8080/'
                 }
             }
         },

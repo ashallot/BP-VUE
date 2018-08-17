@@ -120,6 +120,9 @@ export default {
           console.log(res)
           if (res.status === 200) {
             var Cookie = 'JSESSIONID=' + res.data.data.JSESSIONID
+            var user = res.data.data.user
+            localStorage.userName = user.userName
+            localStorage.user = JSON.stringify(user)
             localStorage.Cookie = Cookie
             this.$router.push({path: '/BPIndex'})
           }
@@ -319,5 +322,13 @@ input:-ms-input-placeholder {
   display: flex;
   flex-direction: column;
 }
+
+.ivu-layout-header {
+    background: white !important;
+}
+.ivu-menu-horizontal.ivu-menu-light:after{
+  background:white !important;
+}
+
 
 </style>
