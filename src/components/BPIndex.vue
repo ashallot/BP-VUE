@@ -27,8 +27,8 @@
             <div style="min-height: 720px;">
               <div class="blank" v-if="listdata.length == 0">
                 <img src="../assets/blank.png" alt=""><br>
-                <p style="color: gray;">您还没上传过BP哦~</p><br>
-                <Button size="large" class="uploadBtn" @click="upload">立即上传</Button>
+                <p style="color: #999999;">您还没上传过BP哦~</p><br>
+                <Button size="large" class="btn-upload-now" @click="upload">立即上传</Button>
               </div>
               <div class="container" v-if="listdata.length > 0">
                 <div class="top">
@@ -399,24 +399,65 @@ export default {
       });
     },
     creat(index){
-      this.modal2 = true;
-      this.content = '该功能即将上线，敬请期待';
+      this.$Modal.info({
+          title: '提示',
+          content: '<p>' + '该功能即将上线，敬请期待' + '</p>',
+          onOk: () => {
+              
+          },
+          onCancel: () => {
+              
+          }
+      });
+      // this.modal2 = true;
+      // this.content = '该功能即将上线，敬请期待';
     },
     reason(index){
-      this.modal2 = true;
-      this.content = '因'+this.listdata[index].failReason+'，该BP未通过审核，请按要求编辑后，重新提交审核';
+      this.$Modal.info({
+          title: '提示',
+          content: '<p>' + '因' + this.listdata[index].failReason + '，该BP未通过审核，请按要求编辑后，重新提交审核' + '</p>',
+          onOk: () => {
+              
+          },
+          onCancel: () => {
+              
+          }
+      });
+      // this.modal2 = true;
+      // this.content = '因'+this.listdata[index].failReason+'，该BP未通过审核，请按要求编辑后，重新提交审核';
     },
     progress(index){
-      this.modal2 = true;
-      this.content = '我们将于7个工作日内完成审核';
+      this.$Modal.info({
+          title: '提示',
+          content: '<p>' + '我们将于7个工作日内完成审核' + '</p>',
+          onOk: () => {
+              
+          },
+          onCancel: () => {
+              
+          }
+      });
+      // this.modal2 = true;
+      // this.content = '我们将于7个工作日内完成审核';
     },
     edit(index){
       this.$router.push({ path: "/BPMgr/"+ this.listdata[index].id});
     },
     remove(index) {
+      const that = this
       // this.listdata.splice(index, 1);
-      this.choise = this.listdata[index];
-      this.modal1 =true;
+      this.$Modal.confirm({
+          title: '提示',
+          content: '<p>' + '您确定要删除“' + this.listdata[index].projectName + '”项目吗？</p>',
+          onOk: () => {
+              that.del()
+          },
+          onCancel: () => {
+              
+          }
+      });
+      // this.choise = this.listdata[index];
+      // this.modal1 =true;
     },
     handlePage(value){
       this.pageNum = value;
@@ -524,6 +565,12 @@ export default {
   opacity: 0.5;
   margin-left: 5px;
 }
+
+.btn-upload-now {
+  background-color: #c63a47;
+  color: white;
+}
+
 .uploadBtn {
   background-color: #c63a47;
   color: white;
@@ -568,6 +615,12 @@ export default {
   min-height: calc(100vh - 64px);
   min-width: 1200px;
   padding: 0px calc((100vw - 1200px) / 2);
+}
+
+.blank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .card-box {

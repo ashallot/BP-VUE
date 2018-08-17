@@ -12,15 +12,15 @@
                     <span>退出系统</span>
                   </div>
                   <div style="float:right;margin-right: 5px;">|</div>
-                  <div style="float:right;margin-right: 5px;">admin</div>
+                  <div style="float:right;margin-right: 5px;">{{ accountName }}</div>
                   <div style="height:60px;"><img style="margin-top: 5px;" src="../assets/head.png" alt=""></div>
                 </div>
             </Menu>
         </Header>
-        <Content :style="{padding: '0 50px'}">
+        <Content class="content-box">
           <Breadcrumb :style="{margin: '20px 0','text-align': 'left'}">
             您当前位置：
-            <BreadcrumbItem>首页</BreadcrumbItem>
+            <!-- <BreadcrumbItem>首页</BreadcrumbItem> -->
             <BreadcrumbItem>填写身份信息</BreadcrumbItem>
           </Breadcrumb>
           <Card>
@@ -101,6 +101,7 @@
 export default {
   data() {
     return {
+      accountName: localStorage.userName,
       username: "",
       email: "",
       team: "",
@@ -157,10 +158,10 @@ export default {
   position: unset;
 }
 .layout {
-  border: 1px solid rgb(58, 59, 60);
+  /* border: 1px solid rgb(58, 59, 60); */
   background: #f5f7f9;
   position: relative;
-  border-radius: 4px;
+  /* border-radius: 4px; */
   overflow: hidden;
 }
 .layout-logo {
@@ -257,4 +258,11 @@ export default {
 .input-cell div {
   margin-left: 150px;
 }
+
+.content-box {
+  min-height: calc(100vh - 64px);
+  min-width: 1200px;
+  padding: 0px calc((100vw - 1200px) / 2);
+}
+
 </style>

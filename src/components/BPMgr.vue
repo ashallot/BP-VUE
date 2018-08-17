@@ -35,7 +35,7 @@
                   <span style="color:red;">*</span>
                   <label>项目名称：</label>
                   <Input v-model="projectName" placeholder="请输入项目名称" :maxlength="11" style="width: 500px" />
-                  <p style="color:gray;float:left;margin-left:20px;">(请输入2-20个字)</p>
+                  <span style="color:#999999; float:left; margin-left:20px;">(请输入2-20个字)</span>
                 </div>
                 <div class="input-cell">
                   <span style="color:red">*</span>
@@ -74,7 +74,7 @@
                       <icon type="md-add" size="60"></icon>
                     </div>
                   </upload>
-                  <p style="color:gray;margin-top: 118px;text-align: left;">(尺寸：290*236)</p>
+                  <span style="color:#999999; margin-top: 118px;text-align: left; margin-left: 20px;">(尺寸：290*236)</span>
                   <Modal title="图片预览" v-model="smallvisible">
                       <img :src="smallPIC.response.data.fileUrl" v-if="smallvisible" style="width: 100%">
                   </Modal>
@@ -111,7 +111,7 @@
                       <icon type="md-add" size="60"></icon>
                     </div>
                   </upload>
-                  <p style="color:gray;margin-top: 189px;text-align: left;">(尺寸：670*377)</p>
+                  <span style="color:#999999;margin-top: 189px;text-align: left;margin-left: 20px;">(尺寸：670*377)</span>
                   <Modal title="图片预览" v-model="topvisible">
                       <img :src="topPIC.response.data.fileUrl" v-if="topvisible" style="width: 100%">
                   </Modal>
@@ -132,7 +132,7 @@
                     type="drag"
                     action='/bp/file/upload'
                     style="display: inline-block;margin-left:10px;margin-top:10px;">
-                    <Button type="error" icon="ios-cloud-upload-outline">上传视频/音频</Button>
+                    <Button class="btn-default">上传视频/音频</Button>
                   </upload>
                   <div style="margin-top: 15px;margin-left: 10px;" v-if="music.status == 'finished'">已上传：{{music.name}}<img @click="musicRemove(music)" style="height: 15px;" src="../assets/del.png" alt=""></div>
                    
@@ -144,6 +144,7 @@
                   <div class="components-container" style="width:100%">
                     <div class="editor-container" style="width:100%">
                       <UE :defaultMsg='defaultMsg' :config='config' :id='ue' ref="ue" style="width:100%"></UE>
+                      <!-- <VueEditor ueditorPath="../../static/ueditor/" style="width:100%"></VueEditor> -->
                     </div>
                   </div>
                 </div>
@@ -208,7 +209,7 @@
                       <img src="../assets/del.png" alt="">
                     </div>
                   </div>
-                  <Button class="submitBtn" @click="addMember">添加成员</Button>
+                  <Button class="btn-default" @click="addMember">添加成员</Button>
                 </div>
               </div>
 
@@ -219,7 +220,7 @@
               </div>
               <div class="container" v-if="modal3">
                 <div class="input-cell">
-                  <span style="color:red;">*</span>
+                  <!-- <span style="color:red;">*</span> -->
                   <label>ppt：</label>
                   <p class="tipword">(格式：pptx，大小建议在500MB内)</p><br>
                   <upload
@@ -232,7 +233,7 @@
                     :on-exceeded-size="pptMaxSize"
                     action='/bp/file/upload'
                     style="display: inline-block;margin-left:10px;margin-top:10px;">
-                    <Button type="error" icon="ios-cloud-upload-outline">上传PPT</Button>
+                    <Button class="btn-default" type="error">上传PPT</Button>
                   </upload>
                   <div style="margin-top: 15px;margin-left: 10px;" v-if="ppt.status == 'finished'">已上传：{{ppt.name}}<img @click="pptRemove(ppt)" style="height: 15px;" src="../assets/del.png" alt=""></div>
                    
@@ -278,8 +279,14 @@ import '../../static/UE/ueditor.all.min.js'
 import '../../static/UE/lang/zh-cn/zh-cn.js'
 import '../../static/UE/ueditor.parse.min.js'
 import UE from "./ue/ue";
+
+import VueEditor from 'vue-ueditor'
+
 export default {
-  components: { UE },
+  components: { 
+    UE,
+    VueEditor
+  },
   data() {
     return {
       userName: localStorage.userName,
@@ -435,7 +442,46 @@ export default {
         this.uploadBP(2)
       }
     },
+    // 验证BP输入是否合理
+    validateBP (isCreate) {
+      var tips = ''
+      var validated = true
+      if (this.projectName == null || this.projectName.trim().length == 0) {
+        tips = '请输入项目名称'
+        validated = false
+      } else if (this.projectIntroduce == null || this.projectIntroduce.trim().length == 0) {
+        tips = '请输入项目简介'
+        validated = false
+      } else if (this.projectDetail == null || this.projectDetail.trim().length == 0) {
+        tips = '请输入项目详细介绍'
+        validated = false
+      } else if (this.companyName == null || this.companyName.trim().length == 0) {
+        tips = '请输入团队或公司名称'
+        validated = false
+      } else if (this.bpTeams == null || this.bpTeams.length == 0) {
+        tips = '请添加团队成员'
+        validated = false
+      } else if (isCreate) {
+        if (this.smallPIC == null || this.smallPIC.length == 0) {
+          tips = '请设置项目展示小图'
+          validated = false
+        } else if (this.topPIC == null || this.topPIC.length == 0) {
+          tips = '请设置项目封面图'
+          validated = false
+        } else if (this.music == null || this.music.name == null) {
+          tips = '请上传BP演讲视频/音频'
+          validated = false
+        }
+      }
+      if (validated == false) {
+        this.$Message.info(tips)
+      }
+      return validated
+    },
     editBP(bpStatus){
+      if (!this.validateBP(false)) {
+        return
+      }
       for(var i=0;i<this.bpTeams.length;i++){
         this.bpTeams[i].headPic = this.bpTeams[i].headpic.response.data.fileName?this.bpTeams[i].headpic.response.data.fileName:'';
       }
@@ -462,6 +508,9 @@ export default {
         });
     },
     uploadBP(bpStatus){
+      if (!this.validateBP(true)) {
+        return
+      }
       if(this.bpTeams.length != 0){
         for(var i=0;i<this.bpTeams.length;i++){
           this.bpTeams[i].headPic = this.bpTeams[i].headpic.response.data.fileName?this.bpTeams[i].headpic.response.data.fileName:'';
@@ -597,6 +646,7 @@ export default {
   background: #f5f7f9;
   position: relative;
   overflow: hidden;
+  text-align: center;
 }
 .layout-logo {
   width: 100px;
@@ -636,12 +686,12 @@ export default {
 .cancelBtn {
   width: 200px;
   margin-top: 30px;
-  font-size: 18px;
+  font-size: 16px;
 }
 .saveBtn {
   width: 200px;
   margin-top: 30px;
-  font-size: 18px;
+  font-size: 16px;
   margin-left: 10px;
 }
 .submitBtn {
@@ -649,7 +699,7 @@ export default {
   margin-top: 30px;
   border: 1px solid #c63a47;
   color: #c63a47;
-  font-size: 18px;
+  font-size: 16px;
   margin-left: 10px;
 }
 .footimg {
@@ -778,6 +828,13 @@ export default {
     font-size: 20px;
     cursor: pointer;
     margin: 0 2px;
+}
+
+.btn-default {
+  background-color: #c63a47;
+  color: white;
+  width: 200px;
+  font-size: 16px;
 }
 
 </style>
