@@ -12,7 +12,7 @@
                     <span>退出系统</span>
                   </div>
                   <div style="float:right;margin-right: 5px;">|</div>
-                  <div style="float:right;margin-right: 5px;">{{userName}}</div>
+                  <div style="float:right;margin-right: 5px;">{{ userName }}</div>
                   <div style="height:60px;"><img style="margin-top: 5px;" src="../assets/head.png" alt=""></div>
                 </div>
             </Menu>
@@ -46,9 +46,9 @@
                   <span style="color:red">*</span>
                   <label>项目展示小图：</label>
                   <p class="tipword">(支持格式：jpg、png，尺寸：290*236，大小在300kb之内)</p><br>
-                  <div class="demo-upload-list">
+                  <div class="demo-upload-list" :style="smallPIC.status === 'finished' ? 'height: 236px;margin-top: 10px;margin-left:10px;' : ''">
                       <template v-if="smallPIC.status === 'finished'">
-                          <img :src="smallPIC.response.data.fileUrl"   style="width:290px;height:236px;margin-left:10px;margin-top:10px;">
+                          <img :src="smallPIC.response.data.fileUrl"   style="width:290px;height:236px;">
                           <div class="demo-upload-list-cover" style="height:236px;line-height:236px;">
                               <Icon type="ios-eye-outline" @click.native="smallView(smallPIC.name)"></Icon>
                               <Icon type="ios-trash-outline" @click.native="smallRemove(smallPIC)"></Icon>
@@ -83,9 +83,9 @@
                   <span style="color:red">*</span>
                   <label>项目封面：</label>
                   <p class="tipword">(支持格式：jpg、png，尺寸：670*377，大小在300kb之内)</p><br>
-                  <div class="demo-upload-list">
+                  <div class="demo-upload-list" :style="topPIC.status === 'finished' ? 'height: 377px; margin-left:10px;margin-top:10px;' : ''">
                       <template v-if="topPIC.status === 'finished'">
-                          <img :src="topPIC.response.data.fileUrl"   style="width:670px;height:377px;margin-left:10px;margin-top:10px;">
+                          <img :src="topPIC.response.data.fileUrl"   style="width:670px;height:377px;">
                           <div class="demo-upload-list-cover" style="height:377px;line-height:377px;">
                               <Icon type="ios-eye-outline" @click.native="topView(topPIC.name)"></Icon>
                               <Icon type="ios-trash-outline" @click.native="topRemove(topPIC)"></Icon>
@@ -171,9 +171,12 @@
                   <label>团队成员：</label><br>
                   <div v-for="(item,index) in bpTeams" :key="index" style="overflow:hidden;width:100%; height: auto; margin: 10px;display: flex;flex-direction:row;">
                     <div class="headpic">
-                      <div class="demo-upload-list">
+                      <div class="demo-upload-list" :style="item.headpic.status === 'finished' ? 'height: 100px;margin-top: 10px;margin-left:10px;' : ''">
                         <template v-if="item.headpic.status === 'finished'">
                             <img :src="item.headpic.response.data.fileUrl"   style="width:100px;height:100px;">
+                            <div class="demo-upload-list-cover" style="height:100px;line-height:100px;">
+                              <Icon type="ios-trash-outline" @click.native="topRemove(topPIC)"></Icon>
+                            </div>
                         </template>
                       </div>
                       <upload v-if="item.headpic.status != 'finished'"
@@ -214,7 +217,9 @@
                       <img src="../assets/del.png" alt="">
                     </div>
                   </div>
-                  <Button class="btn-default" @click="addMember">添加成员</Button>
+                  <div style="width: 100%; display: flex; flex-direction: column;align-items: center; margin-top: 20px;">
+                    <Button class="btn-default" @click="addMember">添加成员</Button>
+                  </div>
                 </div>
               </div>
 
@@ -249,7 +254,7 @@
                    
                 </div>
               </div>
-              <div class="container">
+              <div class="btn-container">
                 <Button class="cancelBtn" @click="cancel">取消</Button>
                 <Button class="saveBtn" @click="save">存为草稿</Button>
                 <Button class="submitBtn" @click="submit">提交审核</Button>
@@ -608,11 +613,13 @@ export default {
             'Content-Type': 'application/json'
           }
         }).then(res => {
+          if (res.data.code != 200) {
+            this.$Message.error('BP信息获取失败！请稍后再试！')
+          }
           that.data = res.data.data;
           that.projectName = that.data.businessPlan.projectName;
           that.projectIntroduce = that.data.businessPlan.projectIntroduce;
           that.defaultMsg = that.data.businessPlan.projectDetail;
-          debugger
           that.companyName = that.data.businessPlan.companyName;
           that.bpTeams = that.data.businessPlan.bpTeams;
           for(var i = 0; i < that.bpTeams.length; i++){
@@ -675,10 +682,11 @@ export default {
   position: unset;
 }
 .layout {
+  /* border: 1px solid rgb(58, 59, 60); */
   background: #f5f7f9;
   position: relative;
+  /* border-radius: 4px; */
   overflow: hidden;
-  text-align: center;
 }
 .layout-logo {
   width: 100px;
@@ -715,6 +723,17 @@ export default {
   opacity: 0.5;
   margin-left: 5px;
 }
+
+.btn-container  {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  margin: 20px;
+}
+
 .cancelBtn {
   width: 200px;
   margin-top: 30px;
