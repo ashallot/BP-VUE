@@ -25,12 +25,12 @@
           </Breadcrumb>
           <Card class="card-box">
             <div style="min-height: 720px;">
-              <div class="blank" v-if="listdata.length == 0">
+              <div class="blank" v-if="this.data == ''">
                 <img src="../assets/blank.png" alt=""><br>
                 <p style="color: #999999;">您还没上传过BP哦~</p><br>
                 <Button size="large" class="btn-upload-now" @click="upload">立即上传</Button>
               </div>
-              <div class="container" v-if="listdata.length > 0">
+              <div class="container" v-if="this.data != ''">
                 <div class="top">
                   <Input v-model="keyword" size="default" placeholder="请输入关键字后回车搜索" style="width: 500px;"
                    @keyup.enter.native="handleSearch()">

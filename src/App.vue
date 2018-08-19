@@ -24,6 +24,11 @@ export default {
     float: left !important;
 }
 
+.edui-default .edui-label {
+    cursor: default;
+    width: 100%;
+}
+
 .edui-for-fullscreen {
     float: right !important;
 }

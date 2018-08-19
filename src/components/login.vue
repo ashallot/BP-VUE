@@ -131,6 +131,8 @@ export default {
                 this.$router.push({path: '/userInfo'})
               }
             }
+          } else if (res.data.code === 500) {
+            this.$Message.error(res.data.message)
           } else {
             this.$Message.error('登录失败！请重试！')
           }

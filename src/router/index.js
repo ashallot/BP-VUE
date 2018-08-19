@@ -4,6 +4,7 @@ import Login from '@/components/Login'
 import userInfo from '@/components/userInfo'
 import BPMgr from '@/components/BPMgr'
 import BPIndex from '@/components/BPIndex'
+import BPDetail from '@/components/BPDetail'
 
 Vue.use(Router)
 
@@ -31,6 +32,11 @@ export default new Router({
             path: '/BPIndex',
             name: 'BPIndex',
             component: BPIndex,
+        },
+        {
+            path: '/BPDetail/:BPId',
+            name: 'BPDetail',
+            component: BPDetail,
         }
     ]
 })
