@@ -8,7 +8,7 @@
                 </div>
                 <div class="layout-nav">
                   <div style="float:right;cursor:pointer;" @click="logout">
-                    <div style="width:15px;height;15px;float: left;margin-right: 5px;"><img src="../assets/logout.png" alt=""></div>
+                    <div style="width:15px;height;15px;float: left;margin-right: 5px;margin-top:3px;"><img src="../assets/logout.png" alt=""></div>
                     <span>退出系统</span>
                   </div>
                   <div style="float:right;margin-right: 5px;">|</div>
@@ -20,17 +20,11 @@
         <Content class="content-box">
           <Breadcrumb :style="{margin: '20px 0','text-align': 'left'}">
             您当前位置：
-            <BreadcrumbItem to="/BPIndex">首页</BreadcrumbItem>
-            <BreadcrumbItem>BP列表</BreadcrumbItem>
+            <BreadcrumbItem>BP管理</BreadcrumbItem>
           </Breadcrumb>
           <Card class="card-box">
             <div style="min-height: 720px;">
-              <div class="blank" v-if="this.data == ''">
-                <img src="../assets/blank.png" alt=""><br>
-                <p style="color: #999999;">您还没上传过BP哦~</p><br>
-                <Button size="large" class="btn-upload-now" @click="upload">立即上传</Button>
-              </div>
-              <div class="container" v-if="this.data != ''">
+              <div class="container">
                 <div class="top">
                   <Input v-model="keyword" size="default" placeholder="请输入关键字后回车搜索" style="width: 500px;"
                    @keyup.enter.native="handleSearch()">
@@ -42,9 +36,16 @@
                   </Select>
                   <Button size="large" class="uploadBtn" @click="upload">上传BP</Button>
                 </div>
-                <Table border style="margin-top:20px;" :columns="columns" :data="listdata"></Table>
-                <Page style="margin-top:20px;text-align:right" :total="pageTotal" :current="pageNum"
-                 show-elevator show-total placement="top" @on-change="handlePage"></Page>
+                <div class="blank" v-if="this.listdata == null || this.listdata.length == 0">
+                  <img src="../assets/blank.png" alt=""><br>
+                  <p style="color: #999999;">您还没上传过BP哦~</p><br>
+                  <Button size="large" class="btn-upload-now" @click="upload">立即上传</Button>
+                </div>
+                <div v-if="this.listdata != null && this.listdata.length > 0">
+                  <Table :loading="loading" stripe style="margin-top:20px;" :columns="columns" :data="listdata"></Table>
+                  <Page style="margin-top:20px;margin-right:10px;text-align:right" :total="pageTotal" :current="pageNum"
+                  show-elevator show-total placement="top" @on-change="handlePage"></Page>
+                </div>
               </div>
             </div>
           </Card>
@@ -98,6 +99,7 @@
 export default {
   data() {
     return {
+      loading: false,
       userName: localStorage.userName,
       data: '',
       keyword: "",
@@ -136,14 +138,18 @@ export default {
         {
           title: "项目名称",
           key: "projectName",
+          align: "center"
         },
         {
           title: "团队名称",
-          key: "companyName"
+          key: "compnyName",
+          align: "center"
         },
         {
           title: "状态",
           key: "bpStatus",
+          width: 90,
+          align: "center",
           render: (h, params) =>{
               let _this = this;
               let texts = '';
@@ -167,6 +173,8 @@ export default {
         {
           title: "生成邀请码",
           key: "inviteCode",
+          width: 100,
+          align: "center",
           render: (h, params) =>{
               let _this = this;
               let texts = "——";
@@ -180,6 +188,8 @@ export default {
           {
           title: "查看人数",
           key: "views",
+          width: 90,
+          align: "center",
           render: (h, params) =>{
               let _this = this;
               let texts = "";
@@ -196,15 +206,21 @@ export default {
         },
         {
           title: "创建时间",
+          align: "center",
           key: "formatCreateAt"
         },
         {
           title: "操作",
-          key: "bpStatus",
-          align: "center",
-          width:250,
+          align: 'center',
+          width: 250,
           render: (h, params) => {
-            return h("div", [
+            return h("div", {
+              style: {
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center'
+              }
+            }, [
               h(
                 "Button",
                 {
@@ -214,7 +230,6 @@ export default {
                   },
                   style: {
                     marginRight: "5px",
-                    float:'left',
                     display:params.row.bpStatus == 2 || params.row.bpStatus == 3 ?'none':"block"
                   },
                   on: {
@@ -234,7 +249,6 @@ export default {
                   },
                   style: {
                     marginRight: "5px",
-                    float:'left',
                     display:params.row.bpStatus == 3?'none':"block"
                   },
                   on: {
@@ -254,7 +268,6 @@ export default {
                   },
                   style: {
                     marginRight: "5px",
-                    float:'left',
                     display:params.row.bpStatus != 2?'none':"block"
                   },
                   on: {
@@ -274,7 +287,6 @@ export default {
                   },
                   style: {
                     marginRight: "5px",
-                    float:'left',
                     display:params.row.bpStatus != 4?'none':"block"
                   },
                   on: {
@@ -294,7 +306,6 @@ export default {
                   },
                   style: {
                     marginRight: "5px",
-                    float:'left',
                     display:params.row.bpStatus != 3?'none':"block"
                   },
                   on: {
@@ -314,7 +325,6 @@ export default {
                   },
                   style: {
                     marginRight: "5px",
-                    float:'left',
                     display:params.row.bpStatus != 5?'none':"block"
                   },
                   on: {
@@ -334,7 +344,6 @@ export default {
                   },
                   style: {
                     marginRight: "5px",
-                    float:'left',
                     display:params.row.bpStatus != 3?'none':"block"
                   },
                   on: {
@@ -481,6 +490,8 @@ export default {
       this.$router.push({path: '/login'})
     },
     getBPList() {
+      const that = this
+      this.loading = true
       this.$https.get('/bp/businessPlan/queryBusinessPlan', {  
           params:{
             pageSize: this.pageSize,
@@ -496,6 +507,7 @@ export default {
           }
         }).then(res => {
           console.log(res.data)
+          that.loading = false
           if (res.data.code == 200) {
             this.data = res.data.data.businessPlans;
             this.listdata = this.data.list;
@@ -514,9 +526,10 @@ export default {
 </script>
 
 <style scoped>
+
 .ivu-input-prefix i,
 .ivu-input-suffix i {
-  line-height: 36px !important;
+  line-height: 32px !important;
 }
 .ivu-layout-header {
   background: rgb(58, 59, 60);
@@ -630,4 +643,5 @@ export default {
 .card-box {
   margin-bottom: 60px;
 }
+
 </style>

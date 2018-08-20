@@ -8,7 +8,7 @@
                 </div>
                 <div class="layout-nav">
                   <div style="float:right;cursor:pointer;" @click="logout">
-                    <div style="width:15px;height;15px;float: left;margin-right: 5px;"><img src="../assets/logout.png" alt=""></div>
+                    <div style="width:15px;height;15px;float: left;margin-right: 5px;margin-top:3px;"><img src="../assets/logout.png" alt=""></div>
                     <span>退出系统</span>
                   </div>
                   <div style="float:right;margin-right: 5px;">|</div>
@@ -20,7 +20,7 @@
         <Content class="content-box">
           <Breadcrumb :style="{margin: '20px 0','text-align': 'left'}">
             您当前位置：
-            <BreadcrumbItem to="/BPIndex">首页</BreadcrumbItem>
+            <BreadcrumbItem to="/BPIndex">BP管理</BreadcrumbItem>
             <BreadcrumbItem>上传BP</BreadcrumbItem>
           </Breadcrumb>
           <Card class="card-box">
@@ -34,7 +34,7 @@
                 <div class="input-cell">
                   <span style="color:red;">*</span>
                   <label>项目名称：</label>
-                  <Input v-model="projectName" placeholder="请输入项目名称" :maxlength="11" style="width: 500px" />
+                  <Input v-model="projectName" placeholder="请输入项目名称" :maxlength="20" style="width: 500px" />
                   <span style="color:#999999; float:left; margin-left:20px;">(请输入2-20个字)</span>
                 </div>
                 <div class="input-cell">
@@ -42,7 +42,7 @@
                   <label>项目简介：</label>
                   <Input v-model="projectIntroduce" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(30字内)" :maxlength="30" style="width: 500px;margin-top: 2px;" />
                 </div>
-                <div class="input-cell" style="height: 280px;">
+                <div class="info-cell" style="height: 280px;">
                   <span style="color:red">*</span>
                   <label>项目展示小图：</label>
                   <p class="tipword">(支持格式：jpg、png，尺寸：290*236，大小在300kb之内)</p><br>
@@ -79,7 +79,7 @@
                       <img :src="smallPIC.response.data.fileUrl" v-if="smallvisible" style="width: 100%">
                   </Modal>
                 </div>
-                <div class="input-cell" style="height:420px;">
+                <div class="info-cell" style="height:420px;">
                   <span style="color:red">*</span>
                   <label>项目封面：</label>
                   <p class="tipword">(支持格式：jpg、png，尺寸：670*377，大小在300kb之内)</p><br>
@@ -116,7 +116,7 @@
                       <img :src="topPIC.response.data.fileUrl" v-if="topvisible" style="width: 100%">
                   </Modal>
                 </div>
-                <div class="input-cell">
+                <div class="info-cell">
                   <span style="color:red">*</span>
                   <label>上传BP演讲视频/音频：</label>
                   <p class="tipword">(支持格式：视频为mp4，音频为mp3，大小在500M之内)</p><br>
@@ -142,7 +142,7 @@
                   </div>
                    
                 </div>
-                <div class="input-cell">
+                <div class="info-cell">
                   <span style="color:red">*</span>
                   <label>项目详情：</label>
                   <p class="tipword">(为保证良好的阅读体验，建议上传宽度为750px，大小在2M之内图片)</p>
@@ -171,7 +171,7 @@
                   <label>团队成员：</label><br>
                   <div v-for="(item,index) in bpTeams" :key="index" style="overflow:hidden;width:100%; height: auto; margin: 10px;display: flex;flex-direction:row;">
                     <div class="headpic">
-                      <div class="demo-upload-list" :style="item.headpic.status === 'finished' ? 'height: 100px;width:100px;' : ''">
+                      <div class="demo-upload-list" :style="item.headpic.status === 'finished' ? 'height: 100px;width:100px;margin-left:10px;margin-top:10px;' : ''">
                         <template v-if="item.headpic.status === 'finished'">
                             <img :src="item.headpic.response.data.fileUrl"   style="width:100px;height:100px;">
                             <div class="demo-upload-list-cover" style="height:100px;line-height:100px;">
@@ -197,20 +197,20 @@
                     <div class="memberInfo">
                       <div style="display: flex; flex-direction: row;">
                         <div class="input-cell" style="display: flex; flex-direction: row;flex: 1;padding-right: 4px;">
-                          <span style="color:red;">*</span>
-                          <span style="width: 80px;">姓名：</span>
+                          <span style="color:red;padding-left:20px;">*</span>
+                          <span style="width: 60px;text-align:right;">姓名：</span>
                           <Input v-model="item.userName" placeholder="请输入团队成员姓名" />
                         </div>
                         <div class="input-cell" style="float:right; display: flex; flex-direction: row;flex: 1;padding-left: 4px;">
-                          <span style="color:red;">*</span>
-                          <span style="width: 80px;">角色：</span>
+                          <span style="color:red;padding-left:20px;">*</span>
+                          <span style="width: 60px;text-align:right;">角色：</span>
                           <Input v-model="item.roles" placeholder="请输入在公司职位或团队中角色" />
                         </div>
                       </div>
                       <div class="input-cell" style="display: flex; flex-direction: row;">
-                        <span style="color:red">*</span>
-                        <span style="width: 68px;">介绍：</span>
-                        <Input v-model="item.introduce" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(150字内)" :maxlength="30" style="flex: 1; margin-top: 2px;" />
+                        <span style="color:red;padding-left:20px;">*</span>
+                        <span style="width: 50px;text-align:right;">介绍：</span>
+                        <Input v-model="item.introduce" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(150字内)" :maxlength="150" style="flex: 1; margin-top: 2px;" />
                       </div>
                     </div>
                     <div @click="delMember(index)" style="margin-left: 20px;cursor:pointer;">
@@ -229,7 +229,7 @@
                 <img v-if="modal3" style="position:absolute;height:50px;top:0;left:200px;" src="../assets/up.png" alt="">
               </div>
               <div class="container" v-if="modal3">
-                <div class="input-cell">
+                <div class="info-cell">
                   <!-- <span style="color:red;">*</span> -->
                   <label>ppt：</label>
                   <p class="tipword">(格式：pptx，大小建议在500MB内)</p><br>
@@ -320,7 +320,12 @@ export default {
       topPICName: "",
       topvisible: false,
       projectName: "",
-      bpTeams: [],
+      bpTeams: [{
+        headpic: "",
+        userName: "",
+        roles: "",
+        introduce: ""
+      }],
       defaultMsg:'',
       editorInstance: '',
       config: {
@@ -395,7 +400,12 @@ export default {
       this.topPIC = [];
     },
     headpicRemove (index) {
-      this.bpTeams[index].headpic = ""
+      var team = this.bpTeams[index]
+      team.headpic = ""
+      this.bpTeams.splice(index, 1, team)
+      // debugger
+      // this.bpTeams[index].headpic = ""
+      // this.bpTeams[index].headPic = ""
     },
     topSuccess(res, file) {
       this.topPIC = file;
@@ -839,16 +849,36 @@ export default {
 .input-cell label,
 .input-cell div {
   float: left;
+  line-height: 32px;
 }
 .input-cell label {
+  margin-left: 8px;
   font-weight: bold;
 }
+
+.info-cell {
+  width: 100%;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+.info-cell span,
+.info-cell label,
+.info-cell div {
+  float: left;
+}
+
+.info-cell label {
+  margin-left: 8px;
+  font-weight: bold;
+}
+
 .tipword {
   float: left;
 }
 .headpic {
   /* height: 100px; */
-  width: 100px;
+  /* width: 110px; */
   display: flex;
   flex-direction: row;
   align-items: center;

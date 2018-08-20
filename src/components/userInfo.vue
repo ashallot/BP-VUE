@@ -8,7 +8,7 @@
                 </div>
                 <div class="layout-nav">
                   <div style="float:right;cursor:pointer;" @click="logout">
-                    <div style="width:15px;height;15px;float: left;margin-right: 5px;"><img src="../assets/logout.png" alt=""></div>
+                    <div style="width:15px;height;15px;float: left;margin-right: 5px;margin-top:3px;"><img src="../assets/logout.png" alt=""></div>
                     <span>退出系统</span>
                   </div>
                   <div style="float:right;margin-right: 5px;">|</div>
@@ -20,7 +20,6 @@
         <Content class="content-box">
           <Breadcrumb :style="{margin: '20px 0','text-align': 'left'}">
             您当前位置：
-            <!-- <BreadcrumbItem>首页</BreadcrumbItem> -->
             <BreadcrumbItem>填写身份信息</BreadcrumbItem>
           </Breadcrumb>
           <Card>
@@ -30,8 +29,8 @@
                 <div class="input-cell">
                   <span style="color:red;">*</span>
                   <label>请填写真实姓名：</label>
-                  <Input @on-change="realNameChanged" v-model="realName" placeholder="请输入姓名" style="width: 500px" />
-                  <div v-if="!realNameValidate" class="warn">
+                  <Input @on-change="realNameChanged" v-model="realName" placeholder="请输入姓名" style="width: 500px" maxlength="20" />
+                  <div v-if="!realNameValidate && commitClick" class="warn">
                     <div style="float:left;margin-left:0"><img src="../assets/warning.png" alt=""></div>
                     <span>请填写真实姓名</span>
                   </div>
@@ -39,8 +38,8 @@
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>请填写常用邮箱：</label>
-                  <Input @on-change="emailChanged" v-model="email" placeholder="请输入邮箱" style="width: 500px" />
-                  <div v-if="!emailValidate" class="warn">
+                  <Input @on-change="emailChanged" v-model="email" placeholder="请输入邮箱" style="width: 500px" maxlength="50" />
+                  <div v-if="!emailValidate && commitClick" class="warn">
                     <div style="float:left;margin-left:0"><img src="../assets/warning.png" alt=""></div>
                     <span>请填写常用邮箱/请填写正确的邮箱地址</span>
                   </div>
@@ -48,8 +47,8 @@
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>请填写公司或团队名称：</label>
-                  <Input @on-change="companyNameChanged" v-model="companyName" placeholder="请输入公司或团队" style="width: 500px;margin-left: 108px !important;" />
-                  <div v-if="!companyNameValidate" class="warn">
+                  <Input @on-change="companyNameChanged" v-model="companyName" placeholder="请输入公司或团队" maxlength="50" style="width: 500px;margin-left: 10px; !important;" />
+                  <div v-if="!companyNameValidate && commitClick" class="warn">
                     <div style="float:left;margin-left:0"><img src="../assets/warning.png" alt=""></div>
                     <span>请填写公司或团队名称</span>
                   </div>
@@ -95,7 +94,8 @@ export default {
       companyName: "",
       realNameValidate: false,
       emailValidate: false,
-      companyNameValidate: false
+      companyNameValidate: false,
+      commitClick: false
     };
   },
   methods: {
@@ -118,7 +118,7 @@ export default {
       }
     },
     submit() {
-
+      this.commitClick = true
       if (!this.realNameValidate || !this.emailValidate || !this.companyNameValidate) {
         return
       }
@@ -254,17 +254,21 @@ export default {
   width: 100%;
   overflow: hidden;
   padding-top: 20px;
+  display: flex;
+  flex-direction: row;
+  line-height: 32px;
 }
 .input-cell span,
 .input-cell label,
 .input-cell div {
   float: left;
+  margin-left: 4px;
 }
 .input-cell label {
   font-weight: bold;
 }
 .input-cell div {
-  margin-left: 150px;
+  margin-left: 10px;
 }
 
 .content-box {

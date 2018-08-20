@@ -59,9 +59,9 @@ axios.interceptors.response.use(function (response) {
     console.log(error)
     // 需要登录
     if (response.status === 401) {
-        router.push({
-            path: '/login'
-        })
+        // router.push({
+        //     path: '/login'
+        // })
     } else if (response.status === 400) {
 
     } else if (response.status === 500) {

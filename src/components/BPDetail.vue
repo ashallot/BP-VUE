@@ -8,7 +8,7 @@
                 </div>
                 <div class="layout-nav">
                   <div style="float:right;cursor:pointer;" @click="logout">
-                    <div style="width:15px;height;15px;float: left;margin-right: 5px;"><img src="../assets/logout.png" alt=""></div>
+                    <div style="width:15px;height;15px;float: left;margin-right: 5px;margin-top:3px;"><img src="../assets/logout.png" alt=""></div>
                     <span>退出系统</span>
                   </div>
                   <div style="float:right;margin-right: 5px;">|</div>
@@ -20,7 +20,7 @@
         <Content class="content-box">
           <Breadcrumb :style="{margin: '20px 0','text-align': 'left'}">
             您当前位置：
-            <BreadcrumbItem to="/BPIndex">首页</BreadcrumbItem>
+            <BreadcrumbItem to="/BPIndex">BP管理</BreadcrumbItem>
             <BreadcrumbItem>BP详情</BreadcrumbItem>
           </Breadcrumb>
           <Card class="card-box">
