@@ -59,7 +59,7 @@
                       </template>
                   </div>
                   <upload v-if="smallPIC.status != 'finished'"
-                    ref="upload"
+                    ref="uploadSmallPic"
                     :show-upload-list="false"
                     :on-success="smallSuccess"
                     :format="['jpg','png']"
@@ -70,8 +70,10 @@
                     type="drag"
                     action='/bp/file/upload'
                     style="display: inline-block;width:290px;height:236px;margin-left:10px;margin-top:10px;">
-                    <div style="width: 290px;height:236px;line-height: 236px;">
-                      <icon type="md-add" size="60"></icon>
+                    <div style="width: 290px;height:236px;display;display:  flex;flex-direction:  column;align-items:  center;justify-content:  center;">
+                      <!-- <icon type="md-add" size="60"></icon> -->
+                      <img src="../assets/add_btn.png" alt="">
+                      <span style="color: #666666; margin-top: 10px;">添加图片</span>
                     </div>
                   </upload>
                   <span style="color:#999999; margin-top: 118px;text-align: left; margin-left: 20px;">(尺寸：290*236)</span>
@@ -96,7 +98,7 @@
                       </template>
                   </div>
                   <upload v-if="topPIC.status != 'finished'"
-                    ref="upload"
+                    ref="uploadCover"
                     :show-upload-list="false"
                     :on-success="topSuccess"
                     :format="['jpg','png']"
@@ -107,8 +109,10 @@
                     type="drag"
                     action='/bp/file/upload'
                     style="display: inline-block;width:670px;height:377px;margin-left:10px;margin-top:10px;">
-                    <div style="width: 670px;height:377px;line-height: 377px;">
-                      <icon type="md-add" size="60"></icon>
+                    <div style="width: 670px;height:377px;display:flex;flex-direction:column;align-items: center;justify-content: center;">
+                      <!-- <icon type="md-add" size="60"></icon> -->
+                      <img src="../assets/add_btn.png" alt="">
+                      <span style="color: #666666; margin-top: 10px;">添加图片</span>
                     </div>
                   </upload>
                   <span style="color:#999999;margin-top: 189px;text-align: left;margin-left: 20px;">(尺寸：670*377)</span>
@@ -117,27 +121,43 @@
                   </Modal>
                 </div>
                 <div class="info-cell">
-                  <span style="color:red">*</span>
-                  <label>上传BP演讲视频/音频：</label>
-                  <p class="tipword">(支持格式：视频为mp4，音频为mp3，大小在500M之内)</p><br>
-                  <upload
-                    ref="upload"
-                    :show-upload-list="false"
-                    :on-success="musicSuccess"
-                    :format="['mp3','mp4']"
-                    :max-size="512000"
-                    :on-format-error="musicFormatError"
-                    :on-exceeded-size="musicMaxSize"
-                    multiple
-                    type="drag"
-                    action='/bp/file/upload'
-                    style="display: inline-block;margin-left:10px;margin-top:10px;">
-                    <Button class="btn-default" type="error">上传视频/音频</Button>
-                  </upload>
-                  <div style="margin-top: 10px;margin-left: 10px;" v-if="music.status == 'finished'">
-                    <div style="background-color: #fef7f7;padding-left:5px;">
-                      <div style="height: 38px;line-height:38px;">已上传：{{music.name}}</div>
-                      <img @click="musicRemove(music)" style="height: 15px;" src="../assets/del.png" alt="">
+                  <div>
+                    <span style="color:red">*</span>
+                    <label>上传BP演讲视频/音频：</label>
+                    <p class="tipword">(支持格式：视频为mp4，音频为mp3，大小在500M之内)</p><br>
+                  </div>
+                  <br>
+                  <div style="display: flex; flex-direction: row; align-items: center;margin-left: 10px; margin-top: 10px;">
+                    <upload
+                      ref="uploadMedia"
+                      :show-upload-list="false"
+                      :default-file-list="defaultMediaList"
+                      :on-success="musicSuccess"
+                      :before-upload="handleBeforeUploadMedia"
+                      :format="['mp3','mp4']"
+                      :max-size="512000"
+                      :on-format-error="musicFormatError"
+                      :on-exceeded-size="musicMaxSize"
+                      multiple
+                      type="drag"
+                      action='/bp/file/upload'
+                      style="display: inline-block;">
+                      <Button class="btn-default" type="error">上传视频/音频</Button>
+                    </upload>
+                    <div v-for="(item, index) in mediaUploadList" :key="item.key">
+                      <template v-if="item.status != 'finished'">
+                        <div style="width: 150px;margin-left: 10px;">
+                          <Progress v-if="item.showProgress" :percent="item.percentage.toFixed(2)" status="active" />
+                        </div>
+                      </template>
+                      <template v-if="item.status == 'finished'">
+                        <div style="margin-left: 10px;">
+                          <div style="background-color: #fef7f7;padding-left:5px;">
+                            <div style="height: 38px;line-height:38px;">已上传：{{item.name}}</div>
+                            <img @click="musicRemove(index)" style="height: 15px;" src="../assets/del.png" alt="">
+                          </div>
+                        </div>
+                      </template>
                     </div>
                   </div>
                    
@@ -180,7 +200,7 @@
                         </template>
                       </div>
                       <upload v-if="item.headpic.status != 'finished'"
-                        ref="upload"
+                        ref="uploadHeadPic"
                         :show-upload-list="false"
                         :on-success="(res,file)=> headPicSuccess(index, res,file)"
                         :format="['jpg','png']"
@@ -188,9 +208,10 @@
                         multiple
                         type="drag"
                         action='/bp/file/upload'
-                        style="display: inline-block;width:100px;height:100px;margin-left:10px;margin-top:10px;">
-                        <div style="width: 100px;height:100px;line-height: 100px;">
-                          <icon type="md-add" size="40"></icon>
+                        class='upload-head'
+                        style="display: inline-block;width:100px;height:100px;margin-left:10px;margin-top:10px;border-radius:50px;">
+                        <div style="width: 100px;height:100px;display:flex;flex-direction:column;align-items: center;justify-content: center;">
+                          <span style="color: #666666;">添加头像</span>
                         </div>
                       </upload>
                     </div>
@@ -304,6 +325,12 @@ export default {
   },
   data() {
     return {
+      defaultMediaList: [],
+      mediaUploadList: [],
+      mediaUploadFileName: '',
+      defaultPPTList: [],
+      pptUploadList: [],
+      pptUploadFileName: '',
       userName: localStorage.userName,
       Cookie: localStorage.Cookie,
       id: "",
@@ -372,12 +399,35 @@ export default {
         desc: "文件" + file.name + "太大, 请选择不超过300kb的文件"
       });
     },
-    musicRemove (file) {
-      this.music = [];
-      console.log(this.music)
+    musicRemove (index) {
+      const fileList = this.$refs.uploadMedia.fileList;
+      this.$refs.uploadMedia.fileList.splice(index, 1);
+      // this.$nextTick(() => { 
+      //   this.mediaUploadList = []
+      // })
+      // this.music = [];
+      // console.log(this.music)
     },
     musicSuccess(res, file) {
+      console.log('------------')
+      console.log(file);
+      this.mediaUploadFileName = file.response.data.fileName
       this.music = file;
+      // const fileList = this.$refs.uploadMedia.fileList;
+      // this.$nextTick(() => { 
+      //   this.mediaUploadList = [file]
+      // })
+      // this.mediaUploadList = [file]
+      // this.$refs.uploadMedia.fileList = [file];
+    },
+    handleBeforeUploadMedia() {
+      const check = this.mediaUploadList.length < 1;
+      if (!check) {
+        this.$Notice.warning({
+          title: '请先删除已上传的音频/视频'
+        });
+      }
+      return check;
     },
     musicFormatError(file) {
       this.$Notice.warning({
@@ -531,7 +581,7 @@ export default {
     },
     editBP(bpStatus){
       const that = this
-      if (!this.validateBP(false)) {
+      if (bpStatus == 2 && !this.validateBP(false)) {
         return
       }
       for(var i=0;i<this.bpTeams.length;i++) {
@@ -551,7 +601,7 @@ export default {
           bpTeams:this.bpTeams,
           mCover:this.smallPIC.length!= 0?this.smallPIC.response.data.fileName:'',
           lCover:this.topPIC.length!= 0?this.topPIC.response.data.fileName:'',
-          mediaPath:this.music.name?this.music.name:'',
+          mediaPath: this.mediaUploadFileName,
           ppt:this.ppt.name?this.ppt.name:''
         }, {
           headers: {
@@ -576,7 +626,7 @@ export default {
     },
     uploadBP(bpStatus){
       const that = this
-      if (!this.validateBP(true)) {
+      if (bpStatus == 2 && !this.validateBP(true)) {
         return
       }
       if(this.bpTeams.length != 0){
@@ -588,6 +638,10 @@ export default {
           this.bpTeams[i].headPic = headPic;
         }
       }
+      // var mediaPath = ''
+      // if (this.mediaUploadList != null && this.mediaUploadList.length > 0) {
+      //   mediaPath = this.mediaUploadList[0].name
+      // }
       this.$https.post('/bp/businessPlan/addBusinessPlanTeam', {
           bpStatus: bpStatus,
           projectName:this.projectName,
@@ -597,7 +651,7 @@ export default {
           bpTeams:this.bpTeams,
           mCover:this.smallPIC.length!= 0?this.smallPIC.response.data.fileName:'',
           lCover:this.topPIC.length!= 0?this.topPIC.response.data.fileName:'',
-          mediaPath:this.music.name?this.music.name:'',
+          mediaPath: this.mediaUploadFileName,
           ppt:this.ppt.name?this.ppt.name:''
 
         }, {
@@ -707,6 +761,14 @@ export default {
             name:that.data.businessPlan.originMediaPath,
             status:that.data.businessPlan.originMediaPath==''?'':"finished"
           };
+          var media = {
+            name:that.data.businessPlan.originMediaPath,
+            status:that.data.businessPlan.originMediaPath==''?'':"finished"
+          };
+          that.defaultMediaList = [media]
+          that.$nextTick(() => { 
+            that.mediaUploadList= that.$refs.uploadMedia.fileList
+          })
           that.ppt = {
             name:that.data.businessPlan.originPpt,
             status:that.data.businessPlan.originPpt==''?'':"finished"
@@ -716,6 +778,7 @@ export default {
   },
   updated() {},
   mounted() {
+    this.mediaUploadList = this.$refs.uploadMedia.fileList
     this.id = this.$route.params.BPId;
     this.Cookie = localStorage.Cookie;
     if(this.id != 0) this.getDetail(this.id);
@@ -923,12 +986,12 @@ export default {
 .demo-upload-list{
     display: inline-block;
     text-align: center;
-    border: 1px solid transparent;
+    border: 0px solid transparent;
     border-radius: 4px;
     overflow: hidden;
     background: #fff;
     position: relative;
-    box-shadow: 0 1px 1px rgba(0,0,0,.2);
+    /* box-shadow: 0 1px 1px rgba(0,0,0,.2); */
 }
 .demo-upload-list img{
     width: 100%;

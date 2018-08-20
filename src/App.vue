@@ -105,4 +105,19 @@ textarea.ivu-input {
   font-size: 12px !important;
 }
 
+.ivu-upload-drag {
+  background: #fef7f7 !important;
+  border: 0px solid #dcdee2 !important;
+  border-radius: 0px !important;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s ease;
+}
+
+.upload-head .ivu-upload-drag {
+  border-radius: 50px !important;
+}
+
 </style>

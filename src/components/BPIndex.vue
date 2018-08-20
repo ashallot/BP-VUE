@@ -142,7 +142,7 @@ export default {
         },
         {
           title: "团队名称",
-          key: "compnyName",
+          key: "companyName",
           align: "center"
         },
         {
@@ -388,15 +388,35 @@ export default {
     confirm(){
       this.modal2 = false;
     },
-    downTo(index){
-      this.typechange(this.listdata[index].id)
+    downTo(index) {
+      const that = this
+      this.$Modal.confirm({
+        title: '提示',
+        content: '<p>' + '您确定要下架“' + this.listdata[index].projectName + '”项目吗？</p>',
+        onOk: () => {
+          that.typechange(that.listdata[index].id, 5)
+        },
+        onCancel: () => {
+            
+        }
+      });
     },
-    upTo(index){
-      this.typechange(this.listdata[index].id)
+    upTo(index) {
+      const that = this
+      this.$Modal.confirm({
+        title: '提示',
+        content: '<p>' + '您确定要上架“' + this.listdata[index].projectName + '”项目吗？</p>',
+        onOk: () => {
+          that.typechange(that.listdata[index].id, 2)
+        },
+        onCancel: () => {
+            
+        }
+      });
     },
-    typechange(id){
+    typechange(id, bpStatus){
       this.$https.post('/bp/businessPlan/updateBusinessPlan', {
-        bpStatus: 2,
+        bpStatus: bpStatus,
         id:id
       }, {
         headers: {
