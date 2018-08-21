@@ -38,8 +38,13 @@
                 </div>
                 <div class="blank" v-if="this.listdata == null || this.listdata.length == 0">
                   <img src="../assets/blank.png" alt=""><br>
-                  <p style="color: #999999;">您还没上传过BP哦~</p><br>
-                  <Button size="large" class="btn-upload-now" @click="upload">立即上传</Button>
+                  <template v-if="!isFiltter">
+                    <p style="color: #999999; font-size: 16px;">您还没上传过BP哦~</p><br>
+                    <Button size="large" class="btn-upload-now" @click="upload">立即上传</Button>
+                  </template>
+                  <template v-if="isFiltter">
+                    <p style="color: #999999; font-size: 16px;">暂无相关BP</p>
+                  </template>
                 </div>
                 <div v-if="this.listdata != null && this.listdata.length > 0">
                   <Table :loading="loading" stripe style="margin-top:20px;" :columns="columns" :data="listdata"></Table>
@@ -99,6 +104,7 @@
 export default {
   data() {
     return {
+      isFiltter: false,
       loading: false,
       userName: localStorage.userName,
       data: '',
@@ -533,6 +539,12 @@ export default {
             this.listdata = this.data.list;
             this.pageTotal = this.data.total;
             this.pageNum = this.data.pageNum;
+            if (this.bpStatus == '0' && this.keyword == '') {
+              this.isFiltter = false
+            } else {
+              this.isFiltter = true
+            }
+            
           } else {
             this.$Message.error('数据获取失败！请稍后再试！')
           }

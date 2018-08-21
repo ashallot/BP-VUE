@@ -40,7 +40,7 @@
                 <div class="input-cell">
                   <span style="color:red">*</span>
                   <label>项目简介：</label>
-                  <Input v-model="projectIntroduce" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(30字内)" :maxlength="30" style="width: 500px;margin-top: 2px;" />
+                  <Input v-model="projectIntroduce" type="textarea" :autosize="{minRows: 5,maxRows: 5}" placeholder="请输入项目简介(40字内)" :maxlength="40" style="width: 500px;margin-top: 2px;" />
                 </div>
                 <div class="info-cell" style="height: 280px;">
                   <span style="color:red">*</span>
@@ -146,7 +146,7 @@
                     </upload>
                     <div v-for="(item, index) in mediaUploadList" :key="item.key">
                       <template v-if="item.status != 'finished'">
-                        <div style="width: 150px;margin-left: 10px;">
+                        <div style="width: 200px;margin-left: 10px;display:  flex;flex-direction:  column;align-items:  center;justify-content:  center;">
                           <Progress v-if="item.showProgress" :percent="item.percentage.toFixed(2)" status="active" />
                         </div>
                       </template>
@@ -231,7 +231,7 @@
                       <div class="input-cell" style="display: flex; flex-direction: row;">
                         <span style="color:red;padding-left:20px;">*</span>
                         <span style="width: 50px;text-align:right;">介绍：</span>
-                        <Input v-model="item.introduce" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入项目简介(150字内)" :maxlength="150" style="flex: 1; margin-top: 2px;" />
+                        <Input v-model="item.introduce" type="textarea" :autosize="{minRows: 5, maxRows: 5}" placeholder="请输入项目简介(250字内)" :maxlength="250" style="flex: 1; margin-top: 2px;" />
                       </div>
                     </div>
                     <div @click="delMember(index)" style="margin-left: 20px;cursor:pointer;">
@@ -251,27 +251,45 @@
               </div>
               <div class="container" v-if="modal3">
                 <div class="info-cell">
+                  <div>
+                    <label>ppt：</label>
+                    <p class="tipword">(格式：pptx，大小建议在500MB内)</p>
+                  </div>
                   <!-- <span style="color:red;">*</span> -->
-                  <label>ppt：</label>
-                  <p class="tipword">(格式：pptx，大小建议在500MB内)</p><br>
-                  <upload
-                    ref="upload"
-                    :show-upload-list="false"
-                    :on-success="pptSuccess"
-                    :format="['pptx']"
-                    :max-size="512000"
-                    :on-format-error="pptFormatError"
-                    :on-exceeded-size="pptMaxSize"
-                    action='/bp/file/upload'
-                    style="display: inline-block;margin-left:10px;margin-top:10px;">
-                    <Button class="btn-default" type="error">上传PPT</Button>
-                  </upload>
-                  <div style="margin-top: 10px;margin-left: 10px;" v-if="ppt.status == 'finished'">
-                    <div style="background-color: #fef7f7;padding-left:5px;">
-                      <div style="height: 38px;line-height:38px;">已上传：{{ppt.name}}</div>
-                      <img @click="pptRemove(ppt)" style="height: 15px;" src="../assets/del.png" alt="">
+                  <br>
+                  <div style="display: flex; flex-direction: row; align-items: center;margin-left: 10px; margin-top: 10px;">
+                    <upload
+                      ref="uploadPPT"
+                      :show-upload-list="false"
+                      :default-file-list="defaultPPTList"
+                      :on-success="pptSuccess"
+                      :format="['pptx']"
+                      :max-size="512000"
+                      :on-format-error="pptFormatError"
+                      :on-exceeded-size="pptMaxSize"
+                      :before-upload="handleBeforeUploadPPT"
+                      action='/bp/file/upload'
+                      style="display: inline-block;">
+                      <Button class="btn-default" type="error">上传PPT</Button>
+                    </upload>
+                    <div v-for="(item, index) in pptUploadList" :key="item.key">
+                      <template v-if="item.status != 'finished'">
+                        <div style="width: 200px;margin-left: 10px;display:  flex;flex-direction:  column;align-items:  center;justify-content:  center;">
+                          <Progress v-if="item.showProgress" :percent="item.percentage.toFixed(2)" status="active" />
+                        </div>
+                      </template>
+                      <template v-if="ppt.status == 'finished'">
+                        <div style="margin-left: 10px;">
+                          <div style="background-color: #fef7f7;padding-left:5px;">
+                            <div style="height: 38px;line-height:38px;">已上传：{{ppt.name}}</div>
+                            <img @click="pptRemove(index)" style="height: 15px;" src="../assets/del.png" alt="">
+                          </div>
+                        </div>
+                      </template>
                     </div>
                   </div>
+                  
+                  
                    
                 </div>
               </div>
@@ -400,6 +418,7 @@ export default {
       });
     },
     musicRemove (index) {
+      this.mediaUploadFileName = ''
       const fileList = this.$refs.uploadMedia.fileList;
       this.$refs.uploadMedia.fileList.splice(index, 1);
       // this.$nextTick(() => { 
@@ -424,7 +443,8 @@ export default {
       const check = this.mediaUploadList.length < 1;
       if (!check) {
         this.$Notice.warning({
-          title: '请先删除已上传的音频/视频'
+          title: '只能上传一个音频或视频',
+          desc: '请先删除已上传的音频/视频，再上传新的音频/视频'
         });
       }
       return check;
@@ -472,10 +492,16 @@ export default {
         desc: "文件" + file.name + "太大, 请选择不超过300k的文件"
       });
     },
-    pptRemove (file) {
-      this.ppt = [];
+    pptRemove (index) {
+      // this.ppt = [];
+      this.pptUploadFileName = '';
+      const fileList = this.$refs.uploadPPT.fileList;
+      this.$refs.uploadPPT.fileList.splice(index, 1);
     },
     pptSuccess(res, file) {
+      console.log('------------')
+      console.log(file);
+      this.pptUploadFileName = file.response.data.fileName;
       this.ppt = file;
     },
     pptFormatError(file) {
@@ -489,6 +515,16 @@ export default {
         title: "超出文件大小限制！",
         desc: "文件" + file.name + "太大, 请选择不超过500MB的文件"
       });
+    },
+    handleBeforeUploadPPT () {
+      const check = this.pptUploadList.length < 1;
+      if (!check) {
+        this.$Notice.warning({
+          title: '只能上传一个PPT',
+          desc: '请先删除已上传的PPT，然后再上传PPT'
+        });
+      }
+      return check;
     },
     headPicSuccess(index,res, file) {
       console.log(index,res,file)
@@ -526,6 +562,9 @@ export default {
       }
     },
     submit() {
+      if (!this.validateBP(this.id == 0)) {
+        return
+      }
       const that = this
       this.$Modal.confirm({
           title: '提示',
@@ -602,7 +641,7 @@ export default {
           mCover:this.smallPIC.length!= 0?this.smallPIC.response.data.fileName:'',
           lCover:this.topPIC.length!= 0?this.topPIC.response.data.fileName:'',
           mediaPath: this.mediaUploadFileName,
-          ppt:this.ppt.name?this.ppt.name:''
+          ppt: this.pptUploadFileName
         }, {
           headers: {
             Cookie: localStorage.Cookie,
@@ -652,7 +691,7 @@ export default {
           mCover:this.smallPIC.length!= 0?this.smallPIC.response.data.fileName:'',
           lCover:this.topPIC.length!= 0?this.topPIC.response.data.fileName:'',
           mediaPath: this.mediaUploadFileName,
-          ppt:this.ppt.name?this.ppt.name:''
+          ppt: this.pptUploadFileName
 
         }, {
           headers: {
@@ -762,23 +801,39 @@ export default {
             status:that.data.businessPlan.originMediaPath==''?'':"finished"
           };
           var media = {
-            name:that.data.businessPlan.originMediaPath,
-            status:that.data.businessPlan.originMediaPath==''?'':"finished"
+            name: that.data.businessPlan.originMediaPath,
+            status: that.data.businessPlan.originMediaPath==''?'':"finished"
           };
-          that.defaultMediaList = [media]
-          that.$nextTick(() => { 
-            that.mediaUploadList= that.$refs.uploadMedia.fileList
-          })
+          if (that.data.businessPlan.originMediaPath != null && that.data.businessPlan.originMediaPath != '') {
+            that.mediaUploadFileName = that.data.businessPlan.originMediaPath
+            that.defaultMediaList = [media]
+            that.$nextTick(() => { 
+              that.mediaUploadList= that.$refs.uploadMedia.fileList
+            })
+          }
+          
           that.ppt = {
             name:that.data.businessPlan.originPpt,
             status:that.data.businessPlan.originPpt==''?'':"finished"
           };
+          var ppt = {
+            name:that.data.businessPlan.originPpt,
+            status:that.data.businessPlan.originPpt==''?'':"finished"
+          };
+          if (that.data.businessPlan.originPpt != null && that.data.businessPlan.originPpt != '') {
+            that.pptUploadFileName = that.data.businessPlan.originPpt
+            that.defaultPPTList = [ppt]
+            that.$nextTick(() => { 
+              that.pptUploadList= that.$refs.uploadPPT.fileList
+            })
+          }
         });
     }
   },
   updated() {},
   mounted() {
     this.mediaUploadList = this.$refs.uploadMedia.fileList
+    this.pptUploadList = this.$refs.uploadPPT.fileList
     this.id = this.$route.params.BPId;
     this.Cookie = localStorage.Cookie;
     if(this.id != 0) this.getDetail(this.id);
@@ -846,7 +901,7 @@ export default {
   align-items: center;
   text-align: center;
   justify-content: center;
-  margin: 20px;
+  /* margin: 20px; */
 }
 
 .cancelBtn {

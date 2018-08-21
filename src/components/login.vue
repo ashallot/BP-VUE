@@ -125,10 +125,33 @@ export default {
               localStorage.userName = user.userName
               localStorage.user = JSON.stringify(user)
               localStorage.Cookie = Cookie
-              if (user.userType != 0) {
+              if (user.userType == 1)  {
+                // 直接跳转到创业者首页
                 this.$router.push({path: '/BPIndex'})
+              } else if (user.userType == 2) {
+                // 提示“该平台仅对创业者开放！”
+                this.$Modal.info({
+                  title: '提示',
+                  content: '<p>' + '该平台仅对创业者开放！' + '</p>',
+                  onOk: () => {
+                      
+                  },
+                  onCancel: () => {
+                      
+                  }
+                });
               } else {
-                this.$router.push({path: '/userInfo'})
+                // 提示去设置创业者信息
+                this.$Modal.info({
+                  title: '提示',
+                  content: '<p>' + '该平台仅对创业者开放！请先设置您的创业者信息~' + '</p>',
+                  onOk: () => {
+                    this.$router.push({path: '/userInfo'})
+                  },
+                  onCancel: () => {
+                      
+                  }
+                });
               }
             }
           } else if (res.data.code === 500) {
