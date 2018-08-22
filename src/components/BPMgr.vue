@@ -474,9 +474,11 @@ export default {
       this.topPIC = [];
     },
     headpicRemove (index) {
+      
       var team = this.bpTeams[index]
-      team.headpic = ""
+      team.headpic.status = ''
       this.bpTeams.splice(index, 1, team)
+      
       // debugger
       // this.bpTeams[index].headpic = ""
       // this.bpTeams[index].headPic = ""
@@ -532,7 +534,20 @@ export default {
     },
     headPicSuccess(index,res, file) {
       console.log(index,res,file)
-      this.bpTeams[index].headpic = file;
+      var team = this.bpTeams[index]
+      team.headpic = file
+      this.bpTeams.splice(index, 1, team)
+      // this.bpTeams[index].headpic = file;
+    },
+    headpicRemove (index) {
+      
+      var team = this.bpTeams[index]
+      team.headpic.status = ''
+      this.bpTeams.splice(index, 1, team)
+      
+      // debugger
+      // this.bpTeams[index].headpic = ""
+      // this.bpTeams[index].headPic = ""
     },
     headPicFormatError(file) {
       this.$Notice.warning({
@@ -615,6 +630,28 @@ export default {
         } else if (this.music == null || this.music.name == null) {
           tips = '请上传BP演讲视频/音频'
           validated = false
+        }
+      }
+      if (this.bpTeams != null && this.bpTeams.length > 0) {
+        for (let i = 0; i < this.bpTeams.length; i++) {
+          const team = this.bpTeams[i];
+          if (team.userName == null || team.userName.trim().length == 0) {
+            tips = '请设置团队成员姓名'
+            validated = false
+            break
+          } else if (team.roles == null || team.roles.trim().length == 0) {
+            tips = '请设置团队成员角色'
+            validated = false
+            break
+          } else if (team.introduce == null || team.introduce.trim().length == 0) {
+            tips = '请设置团队成员介绍'
+            validated = false
+            break
+          } else if (team.headpic == null || team.headpic.length == 0) {
+            tips = '请设置团队成员头像'
+            validated = false
+            break
+          }
         }
       }
       if (validated == false) {

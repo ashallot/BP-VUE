@@ -242,12 +242,12 @@ export default {
   },
   mounted(){
     // 倒计时判断
-    var lastSendCodeTime = parseFloat(localStorage.lastSendCodeTime);
-    var timestamp = (new Date()).valueOf() / 1000;
-    if (lastSendCodeTime + 60 > timestamp) {
-      this.rTime = parseInt(lastSendCodeTime + 60 - timestamp)
-      this.send()
-    }
+    // var lastSendCodeTime = parseFloat(localStorage.lastSendCodeTime);
+    // var timestamp = (new Date()).valueOf() / 1000;
+    // if (lastSendCodeTime + 60 > timestamp) {
+    //   this.rTime = parseInt(lastSendCodeTime + 60 - timestamp)
+    //   this.send()
+    // }
   }
 };
 </script>

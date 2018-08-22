@@ -117,7 +117,7 @@
                       </div>
                       <div class="input-cell" style="display: flex; flex-direction: row;">
                         <span style="color:red">*</span>
-                        <span style="width: 68px;">介绍：</span>
+                        <span style="width: 80px;">介绍：</span>
                         <span>{{item.introduce}}</span>
                       </div>
                     </div>
@@ -136,6 +136,9 @@
                   <label>ppt：</label>
                   <div v-if="ppt != null && ppt.name != ''" style="height: 38px;line-height:38px;">已上传：{{ppt.name}}</div>
                 </div>
+              </div>
+              <div class="btn-container">
+                <Button class="cancelBtn" @click="goBack">返回</Button>
               </div>
             </div>
           </Card>
@@ -323,7 +326,9 @@ export default {
           break;
       }
     },
-    cancel() {},
+    goBack() {
+      this.$router.go(-1);
+    },
     save() {
       if(this.id!=0){
         this.editBP(1)
@@ -732,12 +737,12 @@ export default {
 .demo-upload-list{
     display: inline-block;
     text-align: center;
-    border: 1px solid transparent;
+    /* border: 1px solid transparent; */
     border-radius: 4px;
     overflow: hidden;
     background: #fff;
     position: relative;
-    box-shadow: 0 1px 1px rgba(0,0,0,.2);
+    /* box-shadow: 0 1px 1px rgba(0,0,0,.2); */
 }
 .demo-upload-list img{
     width: 100%;
