@@ -18,15 +18,15 @@
                 <div class="title">手机验证码登录</div>
                 <div class="in-icon" style="margin-top: 30px;margin-bottom: 10px;position: relative;">
                   <span><i class="headpic"></i></span>
-                  <input class="bp-input" v-model="tel" placeholder="请输入手机号" maxlength="11" style="width: 300px" />
+                  <input @focus="telFocus" @blur="telBlur" class="bp-input" v-model="tel" placeholder="请输入手机号" maxlength="11" style="width: 400px" />
                 </div>
-                <div class="warn" v-if="telValidate">
+                <div class="warn" v-if="!telValidate">
                   <div style="float:left"><img src="../assets/warning.png" alt=""></div>
-                  <span>手机号码错误</span>
+                  <span>手机号码格式错误</span>
                 </div>
                 <div class="in-icon" style="margin-top: 10px;margin-bottom: 10px;position: relative;overflow: hidden;">
                   <span><i class="pwdpic"></i></span>
-                  <input class="bp-input" v-model="code" placeholder="请输入验证码" maxlength="4" style="width: 180px;float: left;" />
+                  <input @focus="codeFocus" @blur="codeBlur" class="bp-input" v-model="code" placeholder="请输入验证码" maxlength="4" style="width: 280px;float: left;" />
                   <Button @click="getCode" style="float:left;margin-left:6px;width:112px;height: 40px;">
                     <!-- <div style="color:#c63a47">{{getTxt}}</div> -->
                     <div style="color:#c63a47" v-if="!sendMsgDisabled && !reGet">发送验证码</div>
@@ -34,7 +34,7 @@
                     <div style="color:#c63a47" v-if="sendMsgDisabled">{{rTime+'秒后重新获取'}}</div>
                   </Button>
                 </div>
-                <div class="warn" v-if="codeValidate">
+                <div class="warn" v-if="!codeValidate">
                   <div style="float:left"><img src="../assets/warning.png" alt=""></div>
                   <span>验证码错误</span>
                 </div>
@@ -90,8 +90,8 @@ export default {
       tel: "",
       password: "",
       getTxt: "获取验证码",
-      telValidate:false,
-      codeValidate:false,
+      telValidate: true,
+      codeValidate: true,
       code:'',
       isInvestor:false,
       isUserInfo:false,
@@ -102,11 +102,42 @@ export default {
     };
   },
   methods:{
-    login() {
+    telFocus() {
+      this.telValidate = true;
+    },
+    telBlur () {
+      if (this.tel.substring(0,1) != '1' || this.tel.length != 11) {
+        this.telValidate = false;
+      } else {
+        this.telValidate = true;
+      }
+    },
+    codeFocus() {
+      this.codeValidate = true;
+    },
+    codeBlur () {
       if(this.code == null || this.code.trim().length == 0){
-        this.codeValidate = true;
-      }else{
         this.codeValidate = false;
+      } else {
+        this.codeValidate = true;
+      }
+    },
+    login() {
+      var validate = true
+      if(this.code == null || this.code.trim().length == 0){
+        this.codeValidate = false;
+        validate = false
+      }else{
+        this.codeValidate = true;
+      }
+      if (this.tel.substring(0,1) != '1' || this.tel.length != 11) {
+        this.telValidate = false;
+        validate = false
+      } else {
+        this.telValidate = true;
+      }
+
+      if (validate) {
         this.$https.post('/bp/user/login', {  
           userName: this.tel,  
           vCode: this.code,
@@ -155,7 +186,8 @@ export default {
               }
             }
           } else if (res.data.code === 500) {
-            this.$Message.error(res.data.message)
+            // this.$Message.error(res.data.message)
+            this.codeValidate = false
           } else {
             this.$Message.error('登录失败！请重试！')
           }
@@ -181,10 +213,13 @@ export default {
       if (this.sendMsgDisabled) {
         return
       }
+      
       if (this.tel.substring(0,1) != '1' || this.tel.length != 11) {
-        this.telValidate = true;
-      } else {
         this.telValidate = false;
+      } else {
+        this.telValidate = true;
+      }
+      if (this.telValidate) {
         this.$https.get("/bp/user/sendSms" , {
           params: {
             userName: this.tel
@@ -194,6 +229,8 @@ export default {
           if (res.status === 200) {
             var Cookie = 'JSESSIONID=' + res.data.data.JSESSIONID
             localStorage.Cookie = Cookie
+            var timestamp = (new Date()).valueOf() / 1000;
+            localStorage.lastSendCodeTime = timestamp
             that.send()
           }
         });
@@ -204,7 +241,13 @@ export default {
     }
   },
   mounted(){
-
+    // 倒计时判断
+    var lastSendCodeTime = parseFloat(localStorage.lastSendCodeTime);
+    var timestamp = (new Date()).valueOf() / 1000;
+    if (lastSendCodeTime + 60 > timestamp) {
+      this.rTime = parseInt(lastSendCodeTime + 60 - timestamp)
+      this.send()
+    }
   }
 };
 </script>
@@ -263,10 +306,10 @@ input:-ms-input-placeholder {
 }
 .loginForm {
   height: 400px;
-  width: 300px;
+  width: 400px;
   position: absolute;
   top: 280px;
-  left: calc(50% - 150px);
+  left: calc(50% - 200px);
 }
 .title {
   color: white;
@@ -319,7 +362,7 @@ input:-ms-input-placeholder {
   margin-left: 5px;
 }
 .LoginBtn{
-  width:300px;
+  width: 400px;
   margin-top: 30px;
   background-color:#c63a47;
   border: 1px solid #c63a47;

@@ -25,7 +25,7 @@
           <Card class="card-box">
             <div style="min-height: 720px;">
               <div class="container">
-                <div class="top">
+                <div class="top" v-if="isFiltter || this.listdata != null && this.listdata.length > 0">
                   <Input v-model="keyword" size="default" placeholder="请输入关键字后回车搜索" style="width: 500px;"
                    @keyup.enter.native="handleSearch()">
                     <Icon type="ios-search" slot="prefix"></Icon>
@@ -40,7 +40,7 @@
                   <img src="../assets/blank.png" alt=""><br>
                   <template v-if="!isFiltter">
                     <p style="color: #999999; font-size: 16px;">您还没上传过BP哦~</p><br>
-                    <Button size="large" class="btn-upload-now" @click="upload">立即上传</Button>
+                    <Button shape="circle" size="large" class="btn-upload-now" @click="upload">立即上传</Button>
                   </template>
                   <template v-if="isFiltter">
                     <p style="color: #999999; font-size: 16px;">暂无相关BP</p>
@@ -144,12 +144,38 @@ export default {
         {
           title: "项目名称",
           key: "projectName",
-          align: "center"
+          align: "center",
+          render: (h, params) =>{
+            let _this = this;
+            let texts = "";
+            if(params.row.projectName == ''){
+                texts = "——"
+            } else {
+              texts = params.row.projectName;
+            }
+            return h('div', {  
+              props: {
+              },
+            },texts)
+          }
         },
         {
           title: "团队名称",
           key: "companyName",
-          align: "center"
+          align: "center",
+          render: (h, params) =>{
+            let _this = this;
+            let texts = "";
+            if(params.row.companyName == ''){
+                texts = "——"
+            } else {
+              texts = params.row.companyName;
+            }
+            return h('div', {  
+              props: {
+              },
+            },texts)
+          }
         },
         {
           title: "状态",
@@ -359,6 +385,25 @@ export default {
                   }
                 },
                 "下架"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "text",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                    display:params.row.bpStatus != 3?'none':"block"
+                  },
+                  on: {
+                    click: () => {
+                      this.seeDetail(params.index);
+                    }
+                  }
+                },
+                "查看"
               )
             ]);
           }
@@ -477,6 +522,9 @@ export default {
     },
     edit(index){
       this.$router.push({ path: "/BPMgr/"+ this.listdata[index].id});
+    },
+    seeDetail (index) {
+      this.$router.push({ path: "/BPDetail/"+ this.listdata[index].id});
     },
     remove(index) {
       const that = this
@@ -618,6 +666,7 @@ export default {
 .btn-upload-now {
   background-color: #c63a47;
   color: white;
+  width: 200px;
 }
 
 .uploadBtn {

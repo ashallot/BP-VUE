@@ -120,4 +120,9 @@ textarea.ivu-input {
   border-radius: 50px !important;
 }
 
+.edui-default .edui-editor-breadcrumb {
+    margin: 2px 0 0 3px;
+    display: none !important;
+}
+
 </style>

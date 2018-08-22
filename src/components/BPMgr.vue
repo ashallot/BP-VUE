@@ -41,6 +41,7 @@
                   <span style="color:red">*</span>
                   <label>项目简介：</label>
                   <Input v-model="projectIntroduce" type="textarea" :autosize="{minRows: 5,maxRows: 5}" placeholder="请输入项目简介(40字内)" :maxlength="40" style="width: 500px;margin-top: 2px;" />
+                  <span style="color:#999999; float:left; margin-left:20px;">{{projectIntroduce.length}} / 40</span>
                 </div>
                 <div class="info-cell" style="height: 280px;">
                   <span style="color:red">*</span>
@@ -72,7 +73,7 @@
                     style="display: inline-block;width:290px;height:236px;margin-left:10px;margin-top:10px;">
                     <div style="width: 290px;height:236px;display;display:  flex;flex-direction:  column;align-items:  center;justify-content:  center;">
                       <!-- <icon type="md-add" size="60"></icon> -->
-                      <img src="../assets/add_btn.png" alt="">
+                      <img style="width:70px;height:70px;" src="../assets/add_btn.png" alt="">
                       <span style="color: #666666; margin-top: 10px;">添加图片</span>
                     </div>
                   </upload>
@@ -111,7 +112,7 @@
                     style="display: inline-block;width:670px;height:377px;margin-left:10px;margin-top:10px;">
                     <div style="width: 670px;height:377px;display:flex;flex-direction:column;align-items: center;justify-content: center;">
                       <!-- <icon type="md-add" size="60"></icon> -->
-                      <img src="../assets/add_btn.png" alt="">
+                      <img style="width:70px;height:70px;" src="../assets/add_btn.png" alt="">
                       <span style="color: #666666; margin-top: 10px;">添加图片</span>
                     </div>
                   </upload>
@@ -234,8 +235,11 @@
                         <Input v-model="item.introduce" type="textarea" :autosize="{minRows: 5, maxRows: 5}" placeholder="请输入项目简介(250字内)" :maxlength="250" style="flex: 1; margin-top: 2px;" />
                       </div>
                     </div>
-                    <div @click="delMember(index)" style="margin-left: 20px;cursor:pointer;">
-                      <img src="../assets/del.png" alt="">
+                    <div>
+                      <div @click="delMember(index)" style="margin-left: 20px;cursor:pointer;">
+                        <img src="../assets/del.png" alt="">
+                      </div>
+                      <span style="margin-top: 20px;margin-left: 10px;color:#999999;">{{item.introduce.length}} / 250</span>
                     </div>
                   </div>
                   <div style="width: 100%; display: flex; flex-direction: column;align-items: center; margin-top: 20px;">
@@ -769,33 +773,42 @@ export default {
           that.bpTeams = that.data.businessPlan.bpTeams;
           for(var i = 0; i < that.bpTeams.length; i++){
             var temp = that.bpTeams[i].headPic;
-            that.bpTeams[i].headpic = {
+            if (that.bpTeams[i].originHeadPic != null && that.bpTeams[i].originHeadPic != '') {
+              that.bpTeams[i].headpic = {
+                status:"finished",
+                response:{
+                  data:{
+                    fileUrl:temp
+                  }
+                }
+              }
+            } else {
+              that.bpTeams[i].headpic = ''
+            }
+          };
+          if (that.data.businessPlan.originMCover != null && that.data.businessPlan.originMCover != '') {
+            that.smallPIC = {
               status:"finished",
               response:{
                 data:{
-                  fileUrl:temp
+                  fileUrl:that.data.businessPlan.mCover,
+                  fileName:that.data.businessPlan.originMCover
                 }
               }
-            }
-          };
-          that.smallPIC = {
-            status:"finished",
-            response:{
-              data:{
-                fileUrl:that.data.businessPlan.mCover,
-                fileName:that.data.businessPlan.originMCover
+            };
+          }
+          if (that.data.businessPlan.originLCover != null && that.data.businessPlan.originLCover != '') {
+            that.topPIC = {
+              status:"finished",
+              response:{
+                data:{
+                  fileUrl:that.data.businessPlan.lCover,
+                  fileName:that.data.businessPlan.originLCover
+                }
               }
-            }
-          };
-          that.topPIC = {
-            status:"finished",
-            response:{
-              data:{
-                fileUrl:that.data.businessPlan.lCover,
-                fileName:that.data.businessPlan.originLCover
-              }
-            }
-          };
+            };
+          }
+          
           that.music = {
             name:that.data.businessPlan.originMediaPath,
             status:that.data.businessPlan.originMediaPath==''?'':"finished"
