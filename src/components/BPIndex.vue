@@ -129,7 +129,7 @@ export default {
         },
         {
           value: '3',
-          label: '上架中'
+          label: '已上架'
         },
         {
           value: '4',
@@ -190,7 +190,7 @@ export default {
               }else if (params.row.bpStatus == 2) {
                   texts = "待审核"
               }else if (params.row.bpStatus == 3) {
-                  texts = "上架中"
+                  texts = "已上架"
               }else if (params.row.bpStatus == 4) {
                   texts = "未通过"
               }else if (params.row.bpStatus == 5) {
@@ -458,7 +458,7 @@ export default {
         title: '提示',
         content: '<p>' + '您确定要上架“' + this.listdata[index].projectName + '”项目吗？</p>',
         onOk: () => {
-          that.typechange(that.listdata[index].id, 2)
+          that.typechange(that.listdata[index].id, 3)
         },
         onCancel: () => {
             

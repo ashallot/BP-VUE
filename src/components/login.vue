@@ -22,7 +22,7 @@
                 </div>
                 <div class="warn" v-if="!telValidate">
                   <div style="float:left"><img src="../assets/warning.png" alt=""></div>
-                  <span>手机号码格式错误</span>
+                  <span>{{telTips}}</span>
                 </div>
                 <div class="in-icon" style="margin-top: 10px;margin-bottom: 10px;position: relative;overflow: hidden;">
                   <span><i class="pwdpic"></i></span>
@@ -36,7 +36,7 @@
                 </div>
                 <div class="warn" v-if="!codeValidate">
                   <div style="float:left"><img src="../assets/warning.png" alt=""></div>
-                  <span>验证码错误</span>
+                  <span>{{vcodeTips}}</span>
                 </div>
                 <Button class="LoginBtn" @click="login">登录/注册</Button>
               </div>
@@ -86,6 +86,8 @@
 export default {
   data() {
     return {
+      telTips: '',
+      vcodeTips: '',
       data:'',
       tel: "",
       password: "",
@@ -111,6 +113,11 @@ export default {
       } else {
         this.telValidate = true;
       }
+      if (this.tel.trim().length == 0) {
+        this.telTips = '请输入手机号'
+      } else {
+        this.telTips = '手机号错误'
+      }
     },
     codeFocus() {
       this.codeValidate = true;
@@ -120,6 +127,11 @@ export default {
         this.codeValidate = false;
       } else {
         this.codeValidate = true;
+      }
+      if (this.code.trim().length == 0) {
+        this.vcodeTips = '请输入验证码'
+      } else {
+        this.vcodeTips = '验证码错误'
       }
     },
     login() {
@@ -136,6 +148,8 @@ export default {
       } else {
         this.telValidate = true;
       }
+      this.telBlur()
+      this.codeBlur()
 
       if (validate) {
         this.$https.post('/bp/user/login', {  

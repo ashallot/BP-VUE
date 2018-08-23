@@ -375,7 +375,10 @@ export default {
         }
       }
       if (validated == false) {
-        this.$Message.info(tips)
+        this.$Message.warning({
+          content: tips,
+          duration: 3
+        })
       }
       return validated
     },
